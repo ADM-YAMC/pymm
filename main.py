@@ -23,7 +23,8 @@ def read_root():
         cursor.execute(query)
         contenido = cursor.fetchall()
         for row in contenido:
-            return row
+            lista.append(row)
+        return lista
         conn.close()
     except:
         return "Ocurio un error... "
