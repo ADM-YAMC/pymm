@@ -1,10 +1,11 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.params import Query
+from fastapi.params import Depends, Query
 from conexion import conn
 from pydantic import BaseModel
 import Variables
 import secrets
+from Usuarios import Usuarios
 
 app = FastAPI()
 origins = ["*"]
@@ -93,5 +94,45 @@ def ReLogin(Token:str):
     else:
         return {"ok":False}
 
+
+@app.post("/api/Registro_Usuarios")
+def Registro_Usuarios(u:Usuarios):
+    try:
+        query= "Select Correo from Cliente_Usuario where Correo = '"+u.Correo+"'"
+        cursor = conn.cursor()
+        cursor.execute(query)
+        contenido = cursor.fetchall()
+        for i in contenido:
+            Variables.Correo = i[0]
+        if Variables.Correo == u.Correo:
+            return {"ok": False}
+        else:
+            Datos = (u.Nombre,u.Apellido,u.Fecha_Nacimiento,u.Correo,u.Contraseña, u.Rol)
+            consulta = '''INSERT INTO [dbo].[Cliente_Usuario]
+                ([Nombre]
+                ,[Apellido]
+                ,[Fecha_Nacimiento]
+                ,[Correo]
+                ,[Contraseña]
+                ,[Rol])
+                VALUES
+                (%s,%s,%s,%s,%s,%s)'''
+            cursor.execute(consulta,Datos)
+            conn.commit()
+            return {"ok":True}
+    except:
+        return "Error"
+
+
+@app.put("/app/CerrarSesion/{idUser}")
+def CerrarSesion(idUser:str):
+    try:
+        cursor = conn.cursor()
+        update = "UPDATE [dbo].[Cliente_Usuario] SET Token = 'NULL' WHERE IdUsuarios = '"+str(idUser)+"'"
+        cursor.execute(update)
+        conn.commit()
+        return {"ok":True}
+    except:
+        return {"ok":False}
 
 
