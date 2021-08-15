@@ -1,4 +1,3 @@
-from Registrando_Categorias import Registro_Categorias
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.params import Depends, Query
@@ -9,6 +8,7 @@ import Variables
 import secrets
 from Usuarios import Usuarios
 from Logout import logout
+from Registrando_Categorias import Registro_Categorias
 from Registrando_Productos import Registro_Productos
 import pymssql
 
@@ -217,8 +217,8 @@ def Actualizar_Producto(IdProducto:str, z:Registro_Productos):
     except:
         return {"ok":False}
 
-@app.post("/api/Registro_Categorias/")
-def Registro_Categorias(x:Registro_Categorias):
+@app.post("/api/Registro_Categorias")
+def Registro_Categoria(x:Registro_Categorias):
     try:
         query = "select Nombre_Categoria from Categoria where Nombre_Categoria = '"+str(x.Nombre_categoria)+"'"
         cursor = conn.cursor()
@@ -254,8 +254,46 @@ def Seleccionar_Todas_Categorias():
                                     "Nombre_Categoria": i[1]})
     return Variables.cantidad
 
+@app.get("/api/Seleccionar_Una_Categoria/{IdCategoria}")
+def Seleccionar_Una_Categoria(IdCategoria:str):
+    conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
+    query = "select * from Categoria where IdCategoria = '"+str(IdCategoria)+"'"
+    cursor = conn.cursor(as_dict=True)
+    cursor.execute(query)
+    contenido = cursor.fetchall()
+    for i in contenido:
+        Variables.aux = i
+        
+    if Variables.aux == {}:
+        return {"ok":False}
+    else:
+        return Variables.aux
 
-@app.put("/app/CerrarSesion/{idUser}")
+@app.delete("/api/Borrar_Categoria/{IdCategoria}")
+def Borrar_Categoria(IdCategoria:str):
+    try:
+        query = "delete from Categoria where IdCategoria = '"+str(IdCategoria)+"'"
+        cursor = conn.cursor()
+        cursor.execute(query)
+        conn.commit()
+        return {"ok":True}
+    except:
+        return {"ok":False}
+
+@app.put("/api/Actualizar_Categoria/{IdCategoria}")
+def Actualizar_Categoria(IdCategoria:str, z:Registro_Categorias):
+    try:
+        datos = (z.Nombre_categoria, IdCategoria)
+        consulta = '''UPDATE [dbo].[Categoria] SET Nombre_Categoria = %s WHERE IdCategoria = %s'''
+        cursor = conn.cursor()
+        cursor.execute(consulta, datos)
+        conn.commit()
+        return {"ok":True}
+    except:
+        return {"ok":False}
+
+
+@app.put("/api/CerrarSesion/{idUser}")
 def CerrarSesion(idUser:str):
     try:
         cursor = conn.cursor()
