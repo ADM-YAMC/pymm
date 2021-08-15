@@ -1,3 +1,4 @@
+from Registrando_Categorias import Registro_Categorias
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.params import Depends, Query
@@ -148,8 +149,9 @@ def Registros_Productos(x:Registro_Productos):
                        ,[Foto_producto]
                        ,[Descripcion_producto]
                        ,[Stock]
-                       ,[Precio])
-                        VALUES(%s,%s,%s,%s,%s,%s)
+                       ,[Precio]
+                       ,[EstadoCarrito])
+                        VALUES(%s,%s,%s,%s,%s,%s,0)
                        '''
             cursor = conn.cursor()
             cursor.execute(consulta,datos)
@@ -173,7 +175,8 @@ def Seleccionar_Todo():
                                     "Foto_producto": i[3],
                                     "Descripcion_producto": i[4],
                                     "Stock": i[5],
-                                    "Precio": i[6]})
+                                    "Precio": i[6],
+                                    "Estado": i[7]})
     return Variables.cantidad
 
 @app.get("/api/Seleccionar_Uno/{IdProducto}")
@@ -205,23 +208,52 @@ def Borrar_Producto(IdProducto:str):
 @app.put("/api/Actualizar_Producto/{IdProducto}")
 def Actualizar_Producto(IdProducto:str, z:Registro_Productos):
     try:
-        query = "select Nombre_producto from Producto where Nombre_Producto = '"+str(z.Nombre_producto)+"'"
+        datos = (z.Nombre_producto, z.Categoria_producto, z.Foto_producto, z.Descripcion_producto, z.Stock, z.Precio, IdProducto)
+        consulta = '''UPDATE [dbo].[Producto] SET Nombre_producto = %s, Categoria_producto = %s, Foto_producto = %s, Descripcion_producto = %s, Stock = %s, Precio = %s WHERE IdProducto = %s'''
+        cursor = conn.cursor()
+        cursor.execute(consulta, datos)
+        conn.commit()
+        return {"ok":True}
+    except:
+        return {"ok":False}
+
+@app.post("/api/Registro_Categorias/")
+def Registro_Categorias(x:Registro_Categorias):
+    try:
+        query = "select Nombre_Categoria from Categoria where Nombre_Categoria = '"+str(x.Nombre_categoria)+"'"
         cursor = conn.cursor()
         cursor.execute(query)
         contenido = cursor.fetchall()
         for i in contenido:
-            Variables.nombreproducto = i[0]
-        if Variables.nombreproducto == z.Nombre_producto:
+            Variables.nombrecategoria = i[0]
+        if Variables.nombrecategoria == x.Nombre_categoria:
             return {"ok":False}
         else:
-            datos = (z.Nombre_producto, z.Categoria_producto, z.Foto_producto, z.Descripcion_producto, z.Stock, z.Precio, IdProducto)
-            consulta = '''UPDATE [dbo].[Producto] SET Nombre_producto = %s, Categoria_producto = %s, Foto_producto = %s, Descripcion_producto = %s, Stock = %s, Precio = %s WHERE IdProducto = %s'''
+            datos = (x.Nombre_categoria)
+            consulta = '''INSERT INTO [dbo].[Categoria]
+                       ([Nombre_categoria])
+                        VALUES(%s)
+                       '''
             cursor = conn.cursor()
-            cursor.execute(consulta, datos)
+            cursor.execute(consulta,datos)
             conn.commit()
             return {"ok":True}
     except:
-        return {"ok":False}
+        return "Error"
+
+@app.get("/api/Seleccionar_Todas_Categoria")
+def Seleccionar_Todas_Categorias():
+    query = "select * from  Categoria"
+    conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
+    cursor = conn.cursor()
+    cursor.execute(query)
+    contenido = cursor.fetchall()
+    Variables.cantidad.clear()
+    for i in contenido:
+        Variables.cantidad.append({"IdCategoria": i[0],
+                                    "Nombre_Categoria": i[1]})
+    return Variables.cantidad
+
 
 @app.put("/app/CerrarSesion/{idUser}")
 def CerrarSesion(idUser:str):

@@ -5,5 +5,6 @@ h={}
 token = ""
 Correo = ""
 nombreproducto = ""
+nombrecategoria = ""
 cantidad = []
 aux={}
