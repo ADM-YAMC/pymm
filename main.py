@@ -9,6 +9,8 @@ import secrets
 from Usuarios import Usuarios
 from Logout import logout
 from Registrando_Productos import Registro_Productos
+import pymssql
+
 
 app = FastAPI()
 origins = ["*"]
@@ -82,15 +84,16 @@ def ReLogin(Token:str):
         Variables.IdUser = i[0]
         Variables.token = i[7] 
     if Variables.token == Token:
+        cursor = conn.cursor()
         cursor.execute("select COUNT(IdCarrito) as cantidad from Carrito where IdUsuarios = '"+str(Variables.IdUser)+"' GROUP BY IdUsuarios")
         content = cursor.fetchall()
         for i in content:
                 contentt = {"ok":True,"Cantidad":i[0], "Datos_Usuarios": {"IdUsuario": Variables.h[0], "Nombre":Variables.h[1], "Apellido": Variables.h[2], "Fecha_Nacimiento":Variables.h[3], "Rol":Variables.h[6]}}
         if contentt == {}:
-            #conn.close()
+            conn.close()
             return {"ok":True, "Datos_Usuarios": {"IdUsuario": Variables.h[0], "Nombre":Variables.h[1], "Apellido": Variables.h[2], "Fecha_Nacimiento":Variables.h[3], "Rol":Variables.h[6]}}
         else:
-            #conn.close()
+            conn.close()
             return contentt
     else:
         return {"ok":False}
@@ -118,6 +121,7 @@ def Registro_Usuarios(u:Usuarios):
                 ,[Rol])
                 VALUES
                 (%s,%s,%s,%s,%s,%s)'''
+            cursor = conn.cursor()
             cursor.execute(consulta,Datos)
             conn.commit()
             return {"ok":True}
@@ -147,6 +151,7 @@ def Registros_Productos(x:Registro_Productos):
                        ,[Precio])
                         VALUES(%s,%s,%s,%s,%s,%s)
                        '''
+            cursor = conn.cursor()
             cursor.execute(consulta,datos)
             conn.commit()
             return {"ok":True}
@@ -156,6 +161,7 @@ def Registros_Productos(x:Registro_Productos):
 @app.get("/api/Seleccionar_Todo")
 def Seleccionar_Todo():
     query = "select * from Producto"
+    conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
     cursor = conn.cursor()
     cursor.execute(query)
     contenido = cursor.fetchall()
@@ -172,6 +178,7 @@ def Seleccionar_Todo():
 
 @app.get("/api/Seleccionar_Uno/{IdProducto}")
 def Seleccionar_Uno(IdProducto:str):
+    conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
     query = "select * from Producto where IdProducto = '"+str(IdProducto)+"'"
     cursor = conn.cursor(as_dict=True)
     cursor.execute(query)
@@ -209,6 +216,7 @@ def Actualizar_Producto(IdProducto:str, z:Registro_Productos):
         else:
             datos = (z.Nombre_producto, z.Categoria_producto, z.Foto_producto, z.Descripcion_producto, z.Stock, z.Precio, IdProducto)
             consulta = '''UPDATE [dbo].[Producto] SET Nombre_producto = %s, Categoria_producto = %s, Foto_producto = %s, Descripcion_producto = %s, Stock = %s, Precio = %s WHERE IdProducto = %s'''
+            cursor = conn.cursor()
             cursor.execute(consulta, datos)
             conn.commit()
             return {"ok":True}
