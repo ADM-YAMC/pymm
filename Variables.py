@@ -4,3 +4,6 @@ IdUser = 0
 h={}
 token = ""
 Correo = ""
+nombreproducto = ""
+cantidad = []
+aux={}

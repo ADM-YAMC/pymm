@@ -1,11 +1,14 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.params import Depends, Query
+from pydantic.types import conset
 from conexion import conn
 from pydantic import BaseModel
 import Variables
 import secrets
 from Usuarios import Usuarios
+from Logout import logout
+from Registrando_Productos import Registro_Productos
 
 app = FastAPI()
 origins = ["*"]
@@ -17,9 +20,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-class Logaut(BaseModel):
-    Correo:str
-    Contraseña:str
+
 
 @app.get("/")
 def read_root():
@@ -39,7 +40,7 @@ def read_root():
         return "Ocurrio un error... "
 
 @app.post("/api/login/")
-def Login(a:Logaut):
+def Login(a:logout):
     contentt = {}
     token = secrets.token_hex(80)
     query = "select * from Cliente_Usuario where Correo = '"+a.Correo+"' and Contraseña = '"+a.Contraseña+"'"
@@ -123,6 +124,96 @@ def Registro_Usuarios(u:Usuarios):
     except:
         return "Error"
 
+
+@app.post("/api/Registro_Productos")
+def Registros_Productos(x:Registro_Productos):
+    try:
+        query = "select Nombre_producto from Producto where Nombre_Producto = '"+str(x.Nombre_producto)+"'"
+        cursor = conn.cursor()
+        cursor.execute(query)
+        contenido = cursor.fetchall()
+        for i in contenido:
+            Variables.nombreproducto = i[0]
+        if Variables.nombreproducto == x.Nombre_producto:
+            return {"ok":False}
+        else:
+            datos = (x.Nombre_producto, x.Categoria_producto,x.Foto_producto, x.Descripcion_producto, x.Stock, x.Precio)
+            consulta = '''INSERT INTO [dbo].[Producto]
+                       ([Nombre_producto]
+                       ,[Categoria_producto]
+                       ,[Foto_producto]
+                       ,[Descripcion_producto]
+                       ,[Stock]
+                       ,[Precio])
+                        VALUES(%s,%s,%s,%s,%s,%s)
+                       '''
+            cursor.execute(consulta,datos)
+            conn.commit()
+            return {"ok":True}
+    except:
+        return "Error"
+
+@app.get("/api/Seleccionar_Todo")
+def Seleccionar_Todo():
+    query = "select * from Producto"
+    cursor = conn.cursor()
+    cursor.execute(query)
+    contenido = cursor.fetchall()
+    Variables.cantidad.clear()
+    for i in contenido:
+        Variables.cantidad.append({"IdProducto": i[0],
+                                    "Nombre_producto": i[1],
+                                    "Categoria_producto": i[2],
+                                    "Foto_producto": i[3],
+                                    "Descripcion_producto": i[4],
+                                    "Stock": i[5],
+                                    "Precio": i[6]})
+    return Variables.cantidad
+
+@app.get("/api/Seleccionar_Uno/{IdProducto}")
+def Seleccionar_Uno(IdProducto:str):
+    query = "select * from Producto where IdProducto = '"+str(IdProducto)+"'"
+    cursor = conn.cursor(as_dict=True)
+    cursor.execute(query)
+    contenido = cursor.fetchall()
+    for i in contenido:
+        Variables.aux = i
+        
+    if Variables.aux == {}:
+        return {"ok":False}
+    else:
+        return Variables.aux
+
+@app.delete("/api/Borrar_Producto/{IdProducto}")
+def Borrar_Producto(IdProducto:str):
+    try:
+        query = "delete from Producto where IdProducto = '"+str(IdProducto)+"'"
+        cursor = conn.cursor()
+        cursor.execute(query)
+        conn.commit()
+        return {"ok":True}
+    except:
+        return {"ok":False}
+
+@app.put("/api/Actualizar_Producto/{IdProducto}")
+def Actualizar_Producto(IdProducto:str, z:Registro_Productos):
+    try:
+        query = "select Nombre_producto from Producto where Nombre_Producto = '"+str(z.Nombre_producto)+"'"
+        cursor = conn.cursor()
+        cursor.execute(query)
+        contenido = cursor.fetchall()
+        for i in contenido:
+            Variables.nombreproducto = i[0]
+        if Variables.nombreproducto == z.Nombre_producto:
+            return {"ok":False}
+        else:
+            datos = (z.Nombre_producto, z.Categoria_producto, z.Foto_producto, z.Descripcion_producto, z.Stock, z.Precio, IdProducto)
+            consulta = '''UPDATE [dbo].[Producto] SET Nombre_producto = %s, Categoria_producto = %s, Foto_producto = %s, Descripcion_producto = %s, Stock = %s, Precio = %s WHERE IdProducto = %s'''
+            cursor.execute(consulta, datos)
+            conn.commit()
+            return {"ok":True}
+    except:
+        return {"ok":False}
 
 @app.put("/app/CerrarSesion/{idUser}")
 def CerrarSesion(idUser:str):
