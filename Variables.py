@@ -8,3 +8,4 @@ nombreproducto = ""
 nombrecategoria = ""
 cantidad = []
 aux={}
+aux2={}

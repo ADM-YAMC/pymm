@@ -10,6 +10,7 @@ from Usuarios import Usuarios
 from Logout import logout
 from Registrando_Categorias import Registro_Categorias
 from Registrando_Productos import Registro_Productos
+from Registrando_Slides import Registro_Slides
 import pymssql
 
 
@@ -22,6 +23,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 @app.get("/")
 def read_root():
@@ -127,6 +129,9 @@ def Registro_Usuarios(u:Usuarios):
     except:
         return "Error"
 
+###
+##
+###
 
 @app.post("/api/Registro_Productos")
 def Registros_Productos(x:Registro_Productos):
@@ -215,11 +220,14 @@ def Actualizar_Producto(IdProducto:str, z:Registro_Productos):
     except:
         return {"ok":False}
 
+###                        ###
+## Fin de CRUD DE PRODUCTOS ##
+###                        ###
+
 @app.post("/api/Registro_Categorias")
 def Registro_Categoria(x:Registro_Categorias):
     try:
         query = "select Nombre_Categoria from Categoria where Nombre_Categoria = '"+str(x.Nombre_categoria)+"'"
-        conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
         cursor = conn.cursor()
         cursor.execute(query)
         contenido = cursor.fetchall()
@@ -233,7 +241,6 @@ def Registro_Categoria(x:Registro_Categorias):
                        ([Nombre_categoria])
                         VALUES(%s)
                        '''
-            conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
             cursor = conn.cursor()
             cursor.execute(consulta,datos)
             conn.commit()
@@ -241,7 +248,7 @@ def Registro_Categoria(x:Registro_Categorias):
     except:
         return "Error"
 
-@app.get("/api/Seleccionar_Todas_Categoria")
+@app.get("/api/Mostrar_Todas_Categoria")
 def Seleccionar_Todas_Categorias():
     query = "select * from  Categoria"
     conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
@@ -252,9 +259,13 @@ def Seleccionar_Todas_Categorias():
     for i in contenido:
         Variables.cantidad.append({"IdCategoria": i[0],
                                     "Nombre_Categoria": i[1]})
-    return Variables.cantidad
+                                    
+    if Variables.cantidad.count != 0:
+        return Variables.cantidad
+    else:
+        return {"ok":False}
 
-@app.get("/api/Seleccionar_Una_Categoria/{IdCategoria}")
+@app.get("/api/Mostrar_Una_Categoria/{IdCategoria}")
 def Seleccionar_Una_Categoria(IdCategoria:str):
     conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
     query = "select * from Categoria where IdCategoria = '"+str(IdCategoria)+"'"
@@ -269,7 +280,7 @@ def Seleccionar_Una_Categoria(IdCategoria:str):
     else:
         return Variables.aux
 
-@app.get("/api/Borrar_Categoria/{IdCategoria}")
+@app.delete("/api/Borrar_Categoria/{IdCategoria}")
 def Borrar_Categoria(IdCategoria:str):
     try:
         query = "delete from Categoria where IdCategoria = '"+str(IdCategoria)+"'"
@@ -280,7 +291,7 @@ def Borrar_Categoria(IdCategoria:str):
     except:
         return {"ok":False}
 
-@app.post("/api/Actualizar_Categoria/{IdCategoria}")
+@app.put("/api/Actualizar_Categoria/{IdCategoria}")
 def Actualizar_Categoria(IdCategoria:str, z:Registro_Categorias):
     try:
         datos = (z.Nombre_categoria, IdCategoria)
@@ -292,7 +303,13 @@ def Actualizar_Categoria(IdCategoria:str, z:Registro_Categorias):
     except:
         return {"ok":False}
 
+###                         ###
+## FIN DE CRUD DE CATEGORIAS ##
+###                         ###
 
+'''
+CAMBIO DE CONTRASEÑA PARA EL USUARIO
+'''
 @app.put("/api/Actualizar_Clave_Usuario/{ClaveNueva}")
 def Actualizar_Clave_Usuario(a:logout, ClaveNueva:str):
     query = "select * from Cliente_Usuario where Correo = '"+a.Correo+"' and Contraseña = '"+a.Contraseña+"'"
@@ -311,6 +328,93 @@ def Actualizar_Clave_Usuario(a:logout, ClaveNueva:str):
     else:
         return {"ok":False}
 
+###                                    ###
+## FIN DE CAMBIO CONTRASEÑA DEL USUARIO ##
+###                                    ###
+
+'''
+INICIO CRUD DE SLIDER
+'''
+
+@app.post("/api/Registrar_Slides")
+def Registrar_Slides(x:Registro_Slides):
+    try:
+            Datos = (x.Titulo, x.Recurso)
+            consulta = '''INSERT INTO [dbo].[Slider]
+                ([Titulo]
+                ,[Recurso])
+                VALUES
+                (%s,%s)'''
+            cursor = conn.cursor()
+            cursor.execute(consulta,Datos)
+            conn.commit()
+            return {"ok":True}
+    except:
+        return {"ok":False}
+
+@app.get("/api/Mostrar_Un_Slide/{IdSlider}")
+def Mostrar_Un_Slide(IdSlider:str):
+    query = "select * from Slider where IdSlider = '"+str(IdSlider)+"'"
+    conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
+    cursor = conn.cursor()
+    cursor.execute(query)
+    contenido = cursor.fetchall()
+    for i in contenido:
+        Variables.aux2 = i
+    if Variables.aux2 != {}:
+        return Variables.aux2
+    else:    
+        return {"ok":False}
+
+@app.get("/api/Mostrar_Todos_Slides")
+def Mostrar_Todos_Slides():
+    query = "select * from Slider"
+    conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
+    cursor = conn.cursor()
+    cursor.execute(query)
+    contenido = cursor.fetchall()
+    Variables.cantidad.clear()
+    for i in contenido:
+        Variables.cantidad.append({"IdSlider": i[0],
+                                    "Titulo": i[1],
+                                    "Recurso": i[2]})
+    if Variables.cantidad.count != 0:
+        return Variables.cantidad
+    else:
+        return {"ok":False}
+
+@app.delete("/api/Borrar_Slides/{IdSlider}")
+def Borrar_Slides(IdSlider:str):
+    try:
+        query = "delete from Slider where IdSlider = '"+str(IdSlider)+"'"
+        conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
+        cursor = conn.cursor()
+        cursor.execute(query)
+        conn.commit()
+        return {"ok":True}
+    except:
+        return {"ok":False}
+
+@app.put("/api/Actualizar_Slides/{IdSlider}")
+def Actualizar_Slides(IdSlider:str, x:Registro_Slides):
+    try:
+        datos = (x.Titulo, x.Recurso, IdSlider)
+        consulta = '''UPDATE [dbo].[Slider] SET Titulo = %s, Recurso = %s WHERE IdSlider = %s'''
+        cursor = conn.cursor()
+        cursor.execute(consulta, datos)
+        conn.commit()
+        return {"ok":True}
+    except:
+        return {"ok":False}
+
+###                  ###
+## FIN CRUD DE SLIDER ##
+###                  ###
+
+'''
+MOSTRADO DE USUARIOS PARA EL ADMIN
+'''
+
 @app.get("/api/Mostrar_Usuarios")
 def Mostrar_Usuarios():
     query = "select * from  Cliente_Usuario"
@@ -327,6 +431,11 @@ def Mostrar_Usuarios():
                                     "Token": i[7]})
     return Variables.cantidad
 
+###                          ###
+## FIN DE VISTA PARA EL ADMIN ##
+###                          ###
+
+
 @app.put("/api/CerrarSesion/{idUser}")
 def CerrarSesion(idUser:str):
     try:
@@ -337,3 +446,5 @@ def CerrarSesion(idUser:str):
         return {"ok":True}
     except:
         return {"ok":False}
+
+
