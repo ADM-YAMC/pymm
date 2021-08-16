@@ -269,7 +269,7 @@ def Seleccionar_Una_Categoria(IdCategoria:str):
     else:
         return Variables.aux
 
-@app.delete("/api/Borrar_Categoria/{IdCategoria}")
+@app.get("/api/Borrar_Categoria/{IdCategoria}")
 def Borrar_Categoria(IdCategoria:str):
     try:
         query = "delete from Categoria where IdCategoria = '"+str(IdCategoria)+"'"
