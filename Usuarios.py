@@ -6,3 +6,4 @@ class Usuarios(BaseModel):
     Correo:str
     Contraseña:str
     Rol:str
+    Token:str

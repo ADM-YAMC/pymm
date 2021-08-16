@@ -42,7 +42,7 @@ def read_root():
     except TypeError:
         return "Ocurrio un error... "
 
-@app.post("/api/login/")
+@app.post("/api/login")
 def Login(a:logout):
     contentt = {}
     token = secrets.token_hex(80)
@@ -293,6 +293,40 @@ def Actualizar_Categoria(IdCategoria:str, z:Registro_Categorias):
         return {"ok":False}
 
 
+@app.put("/api/Actualizar_Clave_Usuario/{ClaveNueva}")
+def Actualizar_Clave_Usuario(a:logout, ClaveNueva:str):
+    query = "select * from Cliente_Usuario where Correo = '"+a.Correo+"' and Contraseña = '"+a.Contraseña+"'"
+    cursor = conn.cursor()
+    cursor.execute(query)
+    contenido = cursor.fetchall()
+    for i in contenido:
+        Variables.IdUser = i[0]
+        Variables.user = i[4]
+        Variables.passw = i[5]
+    if Variables.user == a.Correo and Variables.passw == a.Contraseña:
+        update = "UPDATE [dbo].[Cliente_Usuario] SET Contraseña = '"+str(ClaveNueva)+"' WHERE IdUsuarios = '"+str(Variables.IdUser)+"'"
+        cursor.execute(update)
+        conn.commit()
+        return {"ok":True}
+    else:
+        return {"ok":False}
+
+@app.get("/api/Mostrar_Usuarios")
+def Mostrar_Usuarios():
+    query = "select * from  Cliente_Usuario"
+    conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
+    cursor = conn.cursor()
+    cursor.execute(query)
+    contenido = cursor.fetchall()
+    Variables.cantidad.clear()
+    for i in contenido:
+        Variables.cantidad.append({"IdUsuario": i[0],
+                                    "Nombre_Usuario": i[1],
+                                    "Correo": i[4],
+                                    "Contraseña": i[5],
+                                    "Token": i[7]})
+    return Variables.cantidad
+
 @app.put("/api/CerrarSesion/{idUser}")
 def CerrarSesion(idUser:str):
     try:
@@ -303,5 +337,3 @@ def CerrarSesion(idUser:str):
         return {"ok":True}
     except:
         return {"ok":False}
-
-
