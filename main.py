@@ -280,7 +280,7 @@ def Borrar_Categoria(IdCategoria:str):
     except:
         return {"ok":False}
 
-@app.put("/api/Actualizar_Categoria/{IdCategoria}")
+@app.post("/api/Actualizar_Categoria/{IdCategoria}")
 def Actualizar_Categoria(IdCategoria:str, z:Registro_Categorias):
     try:
         datos = (z.Nombre_categoria, IdCategoria)
