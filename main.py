@@ -23,8 +23,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
-
 @app.get("/")
 def read_root():
     try:
@@ -221,6 +219,7 @@ def Actualizar_Producto(IdProducto:str, z:Registro_Productos):
 def Registro_Categoria(x:Registro_Categorias):
     try:
         query = "select Nombre_Categoria from Categoria where Nombre_Categoria = '"+str(x.Nombre_categoria)+"'"
+        conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
         cursor = conn.cursor()
         cursor.execute(query)
         contenido = cursor.fetchall()
@@ -234,6 +233,7 @@ def Registro_Categoria(x:Registro_Categorias):
                        ([Nombre_categoria])
                         VALUES(%s)
                        '''
+            conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
             cursor = conn.cursor()
             cursor.execute(consulta,datos)
             conn.commit()
