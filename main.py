@@ -13,7 +13,6 @@ from Registrando_Productos import Registro_Productos
 from Registrando_Slides import Registro_Slides
 import pymssql
 
-
 app = FastAPI()
 origins = ["*"]
 app.add_middleware(
@@ -24,24 +23,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
-@app.get("/")
-def read_root():
-    try:
-        cursor = conn.cursor()
-        cursor.execute("update  [dbo].[Prueba] set Nombre = 'Vicente' where Nombre = 'Yunior'")
-        lista = []
-        query = "Select Nombre from [dbo].[Prueba]"
-        cursor = conn.cursor(as_dict=True)
-        cursor.execute(query)
-        contenido = cursor.fetchall()
-        for row in contenido:
-            lista.append(row)
-        conn.close()
-        return lista
-    except TypeError:
-        return "Ocurrio un error... "
-
+#region LOGINS
 @app.post("/api/login")
 def Login(a:logout):
     contentt = {}
@@ -72,7 +54,6 @@ def Login(a:logout):
     else:
         return {"ok":False}
 
-
 @app.get("/api/Relogin/{Token}")
 def ReLogin(Token:str):
     contentt = {}
@@ -99,7 +80,20 @@ def ReLogin(Token:str):
     else:
         return {"ok":False}
 
+@app.put("/api/CerrarSesion/{idUser}")
+def CerrarSesion(idUser:str):
+    try:
+        cursor = conn.cursor()
+        update = "UPDATE [dbo].[Cliente_Usuario] SET Token = 'NULL' WHERE IdUsuarios = '"+str(idUser)+"'"
+        cursor.execute(update)
+        conn.commit()
+        return {"ok":True}
+    except:
+        return {"ok":False}
 
+#endregion
+
+#region VAINAS DE USUARIOS
 @app.post("/api/Registro_Usuarios")
 def Registro_Usuarios(u:Usuarios):
     try:
@@ -129,10 +123,26 @@ def Registro_Usuarios(u:Usuarios):
     except:
         return "Error"
 
-###
-##
-###
+@app.post("/api/Actualizar_Clave_Usuario/{ClaveNueva}")
+def Actualizar_Clave_Usuario(a:logout, ClaveNueva:str):
+    query = "select * from Cliente_Usuario where Correo = '"+a.Correo+"' and Contraseña = '"+a.Contraseña+"'"
+    cursor = conn.cursor()
+    cursor.execute(query)
+    contenido = cursor.fetchall()
+    for i in contenido:
+        Variables.IdUser = i[0]
+        Variables.user = i[4]
+        Variables.passw = i[5]
+    if Variables.user == a.Correo and Variables.passw == a.Contraseña:
+        update = "UPDATE [dbo].[Cliente_Usuario] SET Contraseña = '"+str(ClaveNueva)+"' WHERE IdUsuarios = '"+str(Variables.IdUser)+"'"
+        cursor.execute(update)
+        conn.commit()
+        return {"ok":True}
+    else:
+        return {"ok":False}
+#endregion
 
+#region CRUD DE PRODUCTOS
 @app.post("/api/Registro_Productos")
 def Registros_Productos(x:Registro_Productos):
     try:
@@ -197,7 +207,7 @@ def Seleccionar_Uno(IdProducto:str):
     else:
         return Variables.aux
 
-@app.post("/api/Borrar_Producto/{IdProducto}")
+@app.get("/api/Borrar_Producto/{IdProducto}")
 def Borrar_Producto(IdProducto:str):
     try:
         query = "delete from Producto where IdProducto = '"+str(IdProducto)+"'"
@@ -219,11 +229,9 @@ def Actualizar_Producto(IdProducto:str, z:Registro_Productos):
         return {"ok":True}
     except:
         return {"ok":False}
+#endregion
 
-###                        ###
-## Fin de CRUD DE PRODUCTOS ##
-###                        ###
-
+#region CRUD DE CATEGORIAS
 @app.post("/api/Registro_Categorias")
 def Registro_Categoria(x:Registro_Categorias):
     try:
@@ -251,7 +259,6 @@ def Registro_Categoria(x:Registro_Categorias):
 @app.get("/api/Mostrar_Todas_Categoria")
 def Seleccionar_Todas_Categorias():
     try:
-
         query = "select * from  Categoria"
         conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
         cursor = conn.cursor()
@@ -268,19 +275,23 @@ def Seleccionar_Todas_Categorias():
 
 @app.get("/api/Mostrar_Una_Categoria/{IdCategoria}")
 def Seleccionar_Una_Categoria(IdCategoria:str):
-    conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
-    query = "select * from Categoria where IdCategoria = '"+str(IdCategoria)+"'"
-    cursor = conn.cursor(as_dict=True)
-    cursor.execute(query)
-    contenido = cursor.fetchall()
-    for i in contenido:
-        Variables.aux = i
-    if Variables.aux == {}:
-        return {"ok":False}
-    else:
-        return Variables.aux
+    try:
+        conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
+        query = "select * from Categoria where IdCategoria = '"+str(IdCategoria)+"'"
+        cursor = conn.cursor(as_dict=True)
+        cursor.execute(query)
+        contenido = cursor.fetchall()
+        for i in contenido: 
+            Variables.aux = i
+        if Variables.aux == {}:
+            return {"ok":False}
+        else:
+            return Variables.aux
+    except:
+        return "Error"
+    
 
-@app.post("/api/Borrar_Categoria/{IdCategoria}")
+@app.get("/api/Borrar_Categoria/{IdCategoria}")
 def Borrar_Categoria(IdCategoria:str):
     try:
         query = "delete from Categoria where IdCategoria = '"+str(IdCategoria)+"'"
@@ -302,40 +313,9 @@ def Actualizar_Categoria(IdCategoria:str, z:Registro_Categorias):
         return {"ok":True}
     except:
         return {"ok":False}
+#endregion
 
-###                         ###
-## FIN DE CRUD DE CATEGORIAS ##
-###                         ###
-
-'''
-CAMBIO DE CONTRASEÑA PARA EL USUARIO
-'''
-@app.post("/api/Actualizar_Clave_Usuario/{ClaveNueva}")
-def Actualizar_Clave_Usuario(a:logout, ClaveNueva:str):
-    query = "select * from Cliente_Usuario where Correo = '"+a.Correo+"' and Contraseña = '"+a.Contraseña+"'"
-    cursor = conn.cursor()
-    cursor.execute(query)
-    contenido = cursor.fetchall()
-    for i in contenido:
-        Variables.IdUser = i[0]
-        Variables.user = i[4]
-        Variables.passw = i[5]
-    if Variables.user == a.Correo and Variables.passw == a.Contraseña:
-        update = "UPDATE [dbo].[Cliente_Usuario] SET Contraseña = '"+str(ClaveNueva)+"' WHERE IdUsuarios = '"+str(Variables.IdUser)+"'"
-        cursor.execute(update)
-        conn.commit()
-        return {"ok":True}
-    else:
-        return {"ok":False}
-
-###                                    ###
-## FIN DE CAMBIO CONTRASEÑA DEL USUARIO ##
-###                                    ###
-
-'''
-INICIO CRUD DE SLIDER
-'''
-
+#region CRUD DE SLIDER
 @app.post("/api/Registrar_Slides")
 def Registrar_Slides(x:Registro_Slides):
     try:
@@ -383,7 +363,7 @@ def Mostrar_Todos_Slides():
     else:
         return {"ok":False}
 
-@app.post("/api/Borrar_Slides/{IdSlider}")
+@app.get("/api/Borrar_Slides/{IdSlider}")
 def Borrar_Slides(IdSlider:str):
     try:
         query = "delete from Slider where IdSlider = '"+str(IdSlider)+"'"
@@ -406,15 +386,9 @@ def Actualizar_Slides(IdSlider:str, x:Registro_Slides):
         return {"ok":True}
     except:
         return {"ok":False}
+#endregion
 
-###                  ###
-## FIN CRUD DE SLIDER ##
-###                  ###
-
-'''
-MOSTRADO DE USUARIOS PARA EL ADMIN
-'''
-
+#region COSAS DE ADMINS
 @app.get("/api/Mostrar_Usuarios")
 def Mostrar_Usuarios():
     query = "select * from  Cliente_Usuario"
@@ -431,20 +405,20 @@ def Mostrar_Usuarios():
                                     "Token": i[7]})
     return Variables.cantidad
 
-###                          ###
-## FIN DE VISTA PARA EL ADMIN ##
-###                          ###
-
-
-@app.put("/api/CerrarSesion/{idUser}")
-def CerrarSesion(idUser:str):
+@app.get("/")
+def read_root():
     try:
         cursor = conn.cursor()
-        update = "UPDATE [dbo].[Cliente_Usuario] SET Token = 'NULL' WHERE IdUsuarios = '"+str(idUser)+"'"
-        cursor.execute(update)
-        conn.commit()
-        return {"ok":True}
-    except:
-        return {"ok":False}
-
-
+        cursor.execute("update  [dbo].[Prueba] set Nombre = 'Vicente' where Nombre = 'Yunior'")
+        lista = []
+        query = "Select Nombre from [dbo].[Prueba]"
+        cursor = conn.cursor(as_dict=True)
+        cursor.execute(query)
+        contenido = cursor.fetchall()
+        for row in contenido:
+            lista.append(row)
+        conn.close()
+        return lista
+    except TypeError:
+        return "Ocurrio un error... "
+#endregion
