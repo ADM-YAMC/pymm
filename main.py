@@ -197,7 +197,7 @@ def Seleccionar_Uno(IdProducto:str):
     else:
         return Variables.aux
 
-@app.delete("/api/Borrar_Producto/{IdProducto}")
+@app.post("/api/Borrar_Producto/{IdProducto}")
 def Borrar_Producto(IdProducto:str):
     try:
         query = "delete from Producto where IdProducto = '"+str(IdProducto)+"'"
@@ -208,7 +208,7 @@ def Borrar_Producto(IdProducto:str):
     except:
         return {"ok":False}
 
-@app.put("/api/Actualizar_Producto/{IdProducto}")
+@app.post("/api/Actualizar_Producto/{IdProducto}")
 def Actualizar_Producto(IdProducto:str, z:Registro_Productos):
     try:
         datos = (z.Nombre_producto, z.Categoria_producto, z.Foto_producto, z.Descripcion_producto, z.Stock, z.Precio, IdProducto)
@@ -250,19 +250,20 @@ def Registro_Categoria(x:Registro_Categorias):
 
 @app.get("/api/Mostrar_Todas_Categoria")
 def Seleccionar_Todas_Categorias():
-    query = "select * from  Categoria"
-    conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
-    cursor = conn.cursor()
-    cursor.execute(query)
-    contenido = cursor.fetchall()
-    Variables.cantidad.clear()
-    for i in contenido:
-        Variables.cantidad.append({"IdCategoria": i[0],
-                                    "Nombre_Categoria": i[1]})
-                                    
-    if Variables.cantidad.count != 0:
+    try:
+
+        query = "select * from  Categoria"
+        conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
+        cursor = conn.cursor()
+        cursor.execute(query)
+        contenido = cursor.fetchall()
+        Variables.cantidad.clear()
+        for i in contenido:
+            Variables.cantidad.append({"IdCategoria": i[0],
+                                        "Nombre_Categoria": i[1]})
+
         return Variables.cantidad
-    else:
+    except:
         return {"ok":False}
 
 @app.get("/api/Mostrar_Una_Categoria/{IdCategoria}")
@@ -274,13 +275,12 @@ def Seleccionar_Una_Categoria(IdCategoria:str):
     contenido = cursor.fetchall()
     for i in contenido:
         Variables.aux = i
-        
     if Variables.aux == {}:
         return {"ok":False}
     else:
         return Variables.aux
 
-@app.delete("/api/Borrar_Categoria/{IdCategoria}")
+@app.post("/api/Borrar_Categoria/{IdCategoria}")
 def Borrar_Categoria(IdCategoria:str):
     try:
         query = "delete from Categoria where IdCategoria = '"+str(IdCategoria)+"'"
@@ -291,7 +291,7 @@ def Borrar_Categoria(IdCategoria:str):
     except:
         return {"ok":False}
 
-@app.put("/api/Actualizar_Categoria/{IdCategoria}")
+@app.post("/api/Actualizar_Categoria/{IdCategoria}")
 def Actualizar_Categoria(IdCategoria:str, z:Registro_Categorias):
     try:
         datos = (z.Nombre_categoria, IdCategoria)
@@ -310,7 +310,7 @@ def Actualizar_Categoria(IdCategoria:str, z:Registro_Categorias):
 '''
 CAMBIO DE CONTRASEÑA PARA EL USUARIO
 '''
-@app.put("/api/Actualizar_Clave_Usuario/{ClaveNueva}")
+@app.post("/api/Actualizar_Clave_Usuario/{ClaveNueva}")
 def Actualizar_Clave_Usuario(a:logout, ClaveNueva:str):
     query = "select * from Cliente_Usuario where Correo = '"+a.Correo+"' and Contraseña = '"+a.Contraseña+"'"
     cursor = conn.cursor()
@@ -383,7 +383,7 @@ def Mostrar_Todos_Slides():
     else:
         return {"ok":False}
 
-@app.delete("/api/Borrar_Slides/{IdSlider}")
+@app.post("/api/Borrar_Slides/{IdSlider}")
 def Borrar_Slides(IdSlider:str):
     try:
         query = "delete from Slider where IdSlider = '"+str(IdSlider)+"'"
@@ -395,7 +395,7 @@ def Borrar_Slides(IdSlider:str):
     except:
         return {"ok":False}
 
-@app.put("/api/Actualizar_Slides/{IdSlider}")
+@app.post("/api/Actualizar_Slides/{IdSlider}")
 def Actualizar_Slides(IdSlider:str, x:Registro_Slides):
     try:
         datos = (x.Titulo, x.Recurso, IdSlider)
