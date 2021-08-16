@@ -221,6 +221,7 @@ def Borrar_Producto(IdProducto:str):
 @app.post("/api/Actualizar_Producto/{IdProducto}")
 def Actualizar_Producto(IdProducto:str, z:Registro_Productos):
     try:
+        conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
         datos = (z.Nombre_producto, z.Categoria_producto, z.Foto_producto, z.Descripcion_producto, z.Stock, z.Precio, IdProducto)
         consulta = '''UPDATE [dbo].[Producto] SET Nombre_producto = %s, Categoria_producto = %s, Foto_producto = %s, Descripcion_producto = %s, Stock = %s, Precio = %s WHERE IdProducto = %s'''
         cursor = conn.cursor()
