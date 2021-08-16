@@ -38,9 +38,11 @@ def Login(a:logout):
         Variables.user = i[4]
         Variables.passw = i[5]
     if Variables.user == a.Correo and Variables.passw == a.Contraseña:
+        cursor = conn.cursor()
         update = "UPDATE [dbo].[Cliente_Usuario] SET Token = '"+token+"' WHERE IdUsuarios = '"+str(Variables.IdUser)+"'"
         cursor.execute(update)
         conn.commit()
+        cursor = conn.cursor()
         cursor.execute("select COUNT(IdCarrito) as cantidad from Carrito where IdUsuarios = '"+str(Variables.IdUser)+"' GROUP BY IdUsuarios")
         content = cursor.fetchall()
         for i in content:
