@@ -9,3 +9,4 @@ nombrecategoria = ""
 cantidad = []
 aux={}
 aux2={}
+aux3 = ""

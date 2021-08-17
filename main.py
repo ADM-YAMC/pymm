@@ -1,3 +1,5 @@
+from Borrando_Usuarios import Borrar_Usuarios
+from Registrando_Admins import Registro_Admins
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.params import Depends, Query
@@ -23,38 +25,82 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-#region LOGINS
-@app.post("/api/login")
-def Login(a:logout):
-    contentt = {}
-    token = secrets.token_hex(80)
-    query = "select * from Cliente_Usuario where Correo = '"+a.Correo+"' and Contraseña = '"+a.Contraseña+"'"
+#region COSAS DE ADMINS
+@app.get("/")
+def read_root():
+    try:
+        cursor = conn.cursor()
+        cursor.execute("update  [dbo].[Prueba] set Nombre = 'Vicente' where Nombre = 'Yunior'")
+        lista = []
+        query = "Select Nombre from [dbo].[Prueba]"
+        cursor = conn.cursor(as_dict=True)
+        cursor.execute(query)
+        contenido = cursor.fetchall()
+        for row in contenido:
+            lista.append(row)
+        conn.close()
+        return lista
+    except TypeError:
+        return "Ocurrio un error... "
+
+@app.get("/api/Mostrar_Usuarios")
+def Mostrar_Usuarios():
+    query = "select * from  Cliente_Usuario"
+    conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
     cursor = conn.cursor()
     cursor.execute(query)
     contenido = cursor.fetchall()
+    Variables.cantidad.clear()
     for i in contenido:
-        Variables.h = i
-        Variables.IdUser = i[0]
-        Variables.user = i[4]
-        Variables.passw = i[5]
-    if Variables.user == a.Correo and Variables.passw == a.Contraseña:
+        Variables.cantidad.append({"IdUsuario": i[0],
+                                    "Nombre_Usuario": i[1],
+                                    "Apellido_Usuario": i[2],
+                                    "Fecha_Nacimiento": i[3],
+                                    "Correo": i[4],
+                                    "Contraseña": i[5],
+                                    "Rol": i[6],
+                                    "Token": i[7]})
+    return Variables.cantidad
+#endregion
+
+#region LOGINS
+@app.post("/api/login")
+def Login(a:logout):
+    try:
+        contentt = {}
+        token = secrets.token_hex(80)
+        conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
+        query = "select * from Cliente_Usuario where Correo = '"+a.Correo+"' and Contraseña = '"+a.Contraseña+"'"
         cursor = conn.cursor()
-        update = "UPDATE [dbo].[Cliente_Usuario] SET Token = '"+token+"' WHERE IdUsuarios = '"+str(Variables.IdUser)+"'"
-        cursor.execute(update)
-        conn.commit()
-        cursor = conn.cursor()
-        cursor.execute("select COUNT(IdCarrito) as cantidad from Carrito where IdUsuarios = '"+str(Variables.IdUser)+"' GROUP BY IdUsuarios")
-        content = cursor.fetchall()
-        for i in content:
-                contentt = {"ok":True,"Cantidad":i[0], "Datos_Usuarios": {"IdUsuario": Variables.h[0], "Nombre":Variables.h[1], "Apellido": Variables.h[2], "Fecha_Nacimiento":Variables.h[3], "Rol":Variables.h[6], "Token":token}}
-        if contentt == {}:
-            #conn.close()
-            return {"ok":True, "Datos_Usuarios": {"IdUsuario": Variables.h[0], "Nombre":Variables.h[1], "Apellido": Variables.h[2], "Fecha_Nacimiento":Variables.h[3], "Rol":Variables.h[6], "Token":token}}
+        cursor.execute(query)
+        contenido = cursor.fetchall()
+        for i in contenido:
+            Variables.h = i
+            Variables.IdUser = i[0]
+            Variables.user = i[4]
+            Variables.passw = i[5]
+        if Variables.user == a.Correo and Variables.passw == a.Contraseña:
+            conn.ping(reconnect=True) 
+            update = "UPDATE [dbo].[Cliente_Usuario] SET Token = '"+token+"' WHERE IdUsuarios = '"+str(Variables.IdUser)+"'"
+            cursor = conn.cursor()
+            cursor.execute(update)
+            conn.commit()
+            cursor.execute("select COUNT(IdCarrito) as cantidad from Carrito where IdUsuarios = '"+str(Variables.IdUser)+"' GROUP BY IdUsuarios")
+            content = cursor.fetchall()
+            conn.commit()
+            for i in content:
+                    contentt = {"ok":True,"Cantidad":i[0], "Datos_Usuarios": {"IdUsuario": Variables.h[0], "Nombre":Variables.h[1], "Apellido": Variables.h[2], "Fecha_Nacimiento":Variables.h[3], "Rol":Variables.h[6], "Token":token}}
+            if contentt == {}:
+                #conn.close()
+                return {"ok":True, "Datos_Usuarios": {"IdUsuario": Variables.h[0], "Nombre":Variables.h[1], "Apellido": Variables.h[2], "Fecha_Nacimiento":Variables.h[3], "Rol":Variables.h[6], "Token":token}}
+            else:
+                #conn.close()
+                return contentt
         else:
-            #conn.close()
-            return contentt
-    else:
-        return {"ok":False}
+            return {"ok":False}
+    except:
+        conn.ping(reconnect=True)
+    
 
 @app.get("/api/Relogin/{Token}")
 def ReLogin(Token:str):
@@ -93,6 +139,62 @@ def CerrarSesion(idUser:str):
     except:
         return {"ok":False}
 
+#endregion
+
+#region CRUD DE ADMINS
+@app.post("/api/Registro_Admins/{IdAdmin}")
+def Registro_Administradores(IdAdmin:str, u:Registro_Admins):
+    try:
+        query= "Select Rol from Cliente_Usuario where IdUsuarios = '"+str(IdAdmin)+"'"
+        cursor = conn.cursor()
+        cursor.execute(query)
+        contenido = cursor.fetchall()
+        for i in contenido:
+            Variables.aux3 = i[0]
+        if Variables.aux3 != "SuperAdmin":
+            return {"ok": False}
+        else:
+            Datos = (u.Nombre,u.Apellido,u.Fecha_Nacimiento,u.Correo,u.Contraseña, "Administrador")
+            consulta = '''INSERT INTO [dbo].[Cliente_Usuario]
+                ([Nombre]
+                ,[Apellido]
+                ,[Fecha_Nacimiento]
+                ,[Correo]
+                ,[Contraseña]
+                ,[Rol])
+                VALUES
+                (%s,%s,%s,%s,%s,%s)'''
+            cursor = conn.cursor()
+            cursor.execute(consulta,Datos)
+            conn.commit()
+            return {"ok":True}
+    except:
+        return "Error"
+
+@app.post("/api/Borrar_Usuarios")
+def Borrado_Usuarios(x:Borrar_Usuarios):
+    try:
+        query= "Select Rol from Cliente_Usuario where IdUsuarios = '"+x.IdAdmin+"'"
+        cursor = conn.cursor()
+        cursor.execute(query)
+        contenido = cursor.fetchall()
+        for i in contenido:
+            Variables.aux3 = i[0]
+        if Variables.aux3 == "SuperAdmin":
+            borrado = "delete from Cliente_Usuario where IdUsuarios = '"+x.IdUsuario+"'"
+            cursor.execute(borrado)
+            conn.commit()
+            return {"ok":True}
+        elif Variables.aux3 == "Administrador" and x.IdUsuario == "Cliente":
+            borrado = "delete from Cliente_Usuario where IdUsuarios = '"+x.IdUsuario+"'"
+            cursor.execute(borrado)
+            conn.commit()
+            return {"ok":True}
+        else:
+            return {"ok":False}
+    except:
+        return "Error"
+        
 #endregion
 
 #region VAINAS DE USUARIOS
@@ -223,7 +325,6 @@ def Borrar_Producto(IdProducto:str):
 @app.post("/api/Actualizar_Producto/{IdProducto}")
 def Actualizar_Producto(IdProducto:str, z:Registro_Productos):
     try:
-        conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
         datos = (z.Nombre_producto, z.Categoria_producto, z.Foto_producto, z.Descripcion_producto, z.Stock, z.Precio, IdProducto)
         consulta = '''UPDATE [dbo].[Producto] SET Nombre_producto = %s, Categoria_producto = %s, Foto_producto = %s, Descripcion_producto = %s, Stock = %s, Precio = %s WHERE IdProducto = %s'''
         cursor = conn.cursor()
@@ -322,16 +423,16 @@ def Actualizar_Categoria(IdCategoria:str, z:Registro_Categorias):
 @app.post("/api/Registrar_Slides")
 def Registrar_Slides(x:Registro_Slides):
     try:
-            Datos = (x.Titulo, x.Recurso)
-            consulta = '''INSERT INTO [dbo].[Slider]
-                ([Titulo]
-                ,[Recurso])
-                VALUES
-                (%s,%s)'''
-            cursor = conn.cursor()
-            cursor.execute(consulta,Datos)
-            conn.commit()
-            return {"ok":True}
+        Datos = (x.Titulo, x.Recurso)
+        consulta = '''INSERT INTO [dbo].[Slider]
+            ([Titulo]
+            ,[Recurso])
+            VALUES
+            (%s,%s)'''
+        cursor = conn.cursor()
+        cursor.execute(consulta,Datos)
+        conn.commit()
+        return {"ok":True}
     except:
         return {"ok":False}
 
@@ -391,37 +492,30 @@ def Actualizar_Slides(IdSlider:str, x:Registro_Slides):
         return {"ok":False}
 #endregion
 
-#region COSAS DE ADMINS
-@app.get("/api/Mostrar_Usuarios")
-def Mostrar_Usuarios():
-    query = "select * from  Cliente_Usuario"
-    conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
-    cursor = conn.cursor()
-    cursor.execute(query)
-    contenido = cursor.fetchall()
-    Variables.cantidad.clear()
-    for i in contenido:
-        Variables.cantidad.append({"IdUsuario": i[0],
-                                    "Nombre_Usuario": i[1],
-                                    "Correo": i[4],
-                                    "Contraseña": i[5],
-                                    "Token": i[7]})
-    return Variables.cantidad
-
-@app.get("/")
-def read_root():
+#region SACAR FECHA
+@app.get("/api/Sacar_Cumpleaños/{Mes}")
+def Sacar_Cumpleaños(Mes:str):
     try:
+        query = "select * from  Cliente_Usuario"
+        conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
         cursor = conn.cursor()
-        cursor.execute("update  [dbo].[Prueba] set Nombre = 'Vicente' where Nombre = 'Yunior'")
-        lista = []
-        query = "Select Nombre from [dbo].[Prueba]"
-        cursor = conn.cursor(as_dict=True)
         cursor.execute(query)
         contenido = cursor.fetchall()
-        for row in contenido:
-            lista.append(row)
-        conn.close()
-        return lista
-    except TypeError:
-        return "Ocurrio un error... "
+        Variables.cantidad.clear()
+        for i in contenido:
+            x = i[3]
+            aux = x[3] + x[4]
+            if aux == Mes:
+                Variables.cantidad.append({"IdUsuario": i[0],
+                                    "Nombre_Usuario": i[1],
+                                    "Apellido": i[2],
+                                    "Fecha_Nacimiento": i[3],
+                                    "Correo": i[4],
+                                    "Rol": i[6]})
+        if Variables.cantidad != []:
+            return Variables.cantidad
+        else:
+            return {"ok":False}
+    except:
+        return "Error"
 #endregion
