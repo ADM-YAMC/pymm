@@ -61,6 +61,17 @@ def Mostrar_Usuarios():
                                     "Rol": i[6],
                                     "Token": i[7]})
     return Variables.cantidad
+
+@app.get("/api/Mostrar_Conectados")
+def Mostrar_Conectados():
+    query = "select COUNT(IdUsuarios) as Conectados from Cliente_Usuario where Token <> 'NULL'"
+    conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
+    cursor = conn.cursor()
+    cursor.execute(query)
+    contenido = cursor.fetchall()
+    for i in contenido:
+        return {"conectados":i[0]}
+
 #endregion
 
 #region LOGINS
