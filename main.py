@@ -80,7 +80,6 @@ def Login(a:logout):
             Variables.user = i[4]
             Variables.passw = i[5]
         if Variables.user == a.Correo and Variables.passw == a.Contraseña:
-            conn.ping(reconnect=True) 
             update = "UPDATE [dbo].[Cliente_Usuario] SET Token = '"+token+"' WHERE IdUsuarios = '"+str(Variables.IdUser)+"'"
             cursor = conn.cursor()
             cursor.execute(update)
