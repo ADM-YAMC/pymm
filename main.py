@@ -349,6 +349,7 @@ def Actualizar_Producto(IdProducto:str, z:Registro_Productos):
 @app.post("/api/Registro_Categorias")
 def Registro_Categoria(x:Registro_Categorias):
     try:
+        conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
         query = "select Nombre_Categoria from Categoria where Nombre_Categoria = '"+str(x.Nombre_categoria)+"'"
         cursor = conn.cursor()
         cursor.execute(query)
@@ -363,6 +364,7 @@ def Registro_Categoria(x:Registro_Categorias):
                        ([Nombre_categoria])
                         VALUES(%s)
                        '''
+            conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
             cursor = conn.cursor()
             cursor.execute(consulta,datos)
             conn.commit()
