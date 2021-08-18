@@ -64,14 +64,22 @@ def Mostrar_Usuarios():
 
 @app.get("/api/Mostrar_Conectados")
 def Mostrar_Conectados():
-    query = "select COUNT(IdUsuarios) as Conectados from Cliente_Usuario where Token <> 'NULL'"
-    conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
-    cursor = conn.cursor()
-    cursor.execute(query)
-    contenido = cursor.fetchall()
-    for i in contenido:
-        return {"conectados":i[0]}
-
+    try:
+        query = "select COUNT(IdUsuarios) as Conectados from Cliente_Usuario where Token <> 'NULL'"
+        query2 = "select COUNT(IdUsuarios) as Conectados from Cliente_Usuario where Token = 'NULL'"
+        conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
+        cursor = conn.cursor()
+        cursor.execute(query)
+        contenido = cursor.fetchall()
+        for i in contenido:
+            aux1 = i
+            cursor.execute(query2)
+            contenido2 = cursor.fetchall()
+            for x in contenido2:
+                aux2 = x
+        return {"Conectados":aux1,"Desconectados":aux2}
+    except:
+        return "Error" 
 #endregion
 
 #region LOGINS
@@ -349,7 +357,6 @@ def Actualizar_Producto(IdProducto:str, z:Registro_Productos):
 @app.post("/api/Registro_Categorias")
 def Registro_Categoria(x:Registro_Categorias):
     try:
-        conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
         query = "select Nombre_Categoria from Categoria where Nombre_Categoria = '"+str(x.Nombre_categoria)+"'"
         cursor = conn.cursor()
         cursor.execute(query)
@@ -364,7 +371,6 @@ def Registro_Categoria(x:Registro_Categorias):
                        ([Nombre_categoria])
                         VALUES(%s)
                        '''
-            conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
             cursor = conn.cursor()
             cursor.execute(consulta,datos)
             conn.commit()

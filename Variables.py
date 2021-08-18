@@ -7,6 +7,7 @@ Correo = ""
 nombreproducto = ""
 nombrecategoria = ""
 cantidad = []
+conectados = []
 aux={}
 aux2={}
 aux3 = ""
