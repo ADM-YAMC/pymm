@@ -193,6 +193,7 @@ def Registro_Administradores(IdAdmin:str, u:Registro_Admins):
 @app.post("/api/Borrar_Usuarios")
 def Borrado_Usuarios(x:Borrar_Usuarios):
     try:
+        conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
         query= "Select Rol from Cliente_Usuario where IdUsuarios = '"+x.IdAdmin+"'"
         cursor = conn.cursor()
         cursor.execute(query)
@@ -214,6 +215,24 @@ def Borrado_Usuarios(x:Borrar_Usuarios):
     except:
         return "Error"
         
+@app.post("/api/Modificar_Usuarios/{Rol}")
+def Modificar_Usuarios(Rol:str, x:Borrar_Usuarios):
+    try:
+        query= "Select Rol from Cliente_Usuario where IdUsuarios = '"+x.IdAdmin+"'"
+        cursor = conn.cursor()
+        cursor.execute(query)
+        contenido = cursor.fetchall()
+        for i in contenido:
+            Variables.aux3 = i[0]
+        if Variables.aux3 == "SuperAdmin":
+            cambio = "UPDATE [dbo].[Cliente_Usuario] SET Rol = '"+str(Rol)+"' WHERE IdUsuarios = '"+(x.IdUsuario)+"'"
+            cursor.execute(cambio)
+            conn.commit()
+            return {"ok":True}
+        else:
+            return {"ok":False}
+    except:
+        return "Error"
 #endregion
 
 #region VAINAS DE USUARIOS
