@@ -3,7 +3,7 @@ from Registrando_Admins import Registro_Admins
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.params import Depends, Query
-from pydantic.types import conset
+from pydantic.types import condecimal, conset
 from conexion import conn
 from pydantic import BaseModel
 import Variables
@@ -146,9 +146,10 @@ def ReLogin(Token:str):
     else:
         return {"ok":False}
 
-@app.put("/api/CerrarSesion/{idUser}")
+@app.post("/api/CerrarSesion/{idUser}")
 def CerrarSesion(idUser:str):
     try:
+        conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
         cursor = conn.cursor()
         update = "UPDATE [dbo].[Cliente_Usuario] SET Token = 'NULL' WHERE IdUsuarios = '"+str(idUser)+"'"
         cursor.execute(update)
@@ -163,7 +164,6 @@ def CerrarSesion(idUser:str):
 @app.post("/api/Registro_Admins/{IdAdmin}")
 def Registro_Administradores(IdAdmin:str, u:Registro_Admins):
     try:
-        conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
         query= "Select Rol from Cliente_Usuario where IdUsuarios = '"+str(IdAdmin)+"'"
         cursor = conn.cursor()
         cursor.execute(query)
@@ -193,7 +193,6 @@ def Registro_Administradores(IdAdmin:str, u:Registro_Admins):
 @app.post("/api/Borrar_Usuarios")
 def Borrado_Usuarios(x:Borrar_Usuarios):
     try:
-        conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
         query= "Select Rol from Cliente_Usuario where IdUsuarios = '"+x.IdAdmin+"'"
         cursor = conn.cursor()
         cursor.execute(query)
@@ -221,7 +220,6 @@ def Borrado_Usuarios(x:Borrar_Usuarios):
 @app.post("/api/Registro_Usuarios")
 def Registro_Usuarios(u:Usuarios):
     try:
-        conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
         query= "Select Correo from Cliente_Usuario where Correo = '"+u.Correo+"'"
         cursor = conn.cursor()
         cursor.execute(query)
@@ -250,7 +248,6 @@ def Registro_Usuarios(u:Usuarios):
 
 @app.post("/api/Actualizar_Clave_Usuario/{ClaveNueva}")
 def Actualizar_Clave_Usuario(a:logout, ClaveNueva:str):
-    conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
     query = "select * from Cliente_Usuario where Correo = '"+a.Correo+"' and Contraseña = '"+a.Contraseña+"'"
     cursor = conn.cursor()
     cursor.execute(query)
@@ -272,7 +269,6 @@ def Actualizar_Clave_Usuario(a:logout, ClaveNueva:str):
 @app.post("/api/Registro_Productos")
 def Registros_Productos(x:Registro_Productos):
     try:
-        conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
         query = "select Nombre_producto from Producto where Nombre_Producto = '"+str(x.Nombre_producto)+"'"
         cursor = conn.cursor()
         cursor.execute(query)
@@ -337,7 +333,6 @@ def Seleccionar_Uno(IdProducto:str):
 @app.get("/api/Borrar_Producto/{IdProducto}")
 def Borrar_Producto(IdProducto:str):
     try:
-        conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
         query = "delete from Producto where IdProducto = '"+str(IdProducto)+"'"
         cursor = conn.cursor()
         cursor.execute(query)
@@ -349,7 +344,6 @@ def Borrar_Producto(IdProducto:str):
 @app.post("/api/Actualizar_Producto/{IdProducto}")
 def Actualizar_Producto(IdProducto:str, z:Registro_Productos):
     try:
-        conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
         datos = (z.Nombre_producto, z.Categoria_producto, z.Foto_producto, z.Descripcion_producto, z.Stock, z.Precio, IdProducto)
         consulta = '''UPDATE [dbo].[Producto] SET Nombre_producto = %s, Categoria_producto = %s, Foto_producto = %s, Descripcion_producto = %s, Stock = %s, Precio = %s WHERE IdProducto = %s'''
         cursor = conn.cursor()
@@ -364,7 +358,6 @@ def Actualizar_Producto(IdProducto:str, z:Registro_Productos):
 @app.post("/api/Registro_Categorias")
 def Registro_Categoria(x:Registro_Categorias):
     try:
-        conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
         query = "select Nombre_Categoria from Categoria where Nombre_Categoria = '"+str(x.Nombre_categoria)+"'"
         cursor = conn.cursor()
         cursor.execute(query)
@@ -424,7 +417,6 @@ def Seleccionar_Una_Categoria(IdCategoria:str):
 @app.get("/api/Borrar_Categoria/{IdCategoria}")
 def Borrar_Categoria(IdCategoria:str):
     try:
-        conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
         query = "delete from Categoria where IdCategoria = '"+str(IdCategoria)+"'"
         cursor = conn.cursor()
         cursor.execute(query)
@@ -436,7 +428,6 @@ def Borrar_Categoria(IdCategoria:str):
 @app.post("/api/Actualizar_Categoria/{IdCategoria}")
 def Actualizar_Categoria(IdCategoria:str, z:Registro_Categorias):
     try:
-        conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
         datos = (z.Nombre_categoria, IdCategoria)
         consulta = '''UPDATE [dbo].[Categoria] SET Nombre_Categoria = %s WHERE IdCategoria = %s'''
         cursor = conn.cursor()
@@ -451,7 +442,6 @@ def Actualizar_Categoria(IdCategoria:str, z:Registro_Categorias):
 @app.post("/api/Registrar_Slides")
 def Registrar_Slides(x:Registro_Slides):
     try:
-        conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
         Datos = (x.Titulo, x.Recurso)
         consulta = '''INSERT INTO [dbo].[Slider]
             ([Titulo]
