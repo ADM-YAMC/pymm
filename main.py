@@ -285,7 +285,7 @@ def Actualizar_Clave_Usuario(a:logout, ClaveNueva:str):
         return {"ok":False}
 #endregion
 
-#region CRUD DE PRODUCTOS
+#region CRUD DE PRODUCTO
 @app.post("/api/Registro_Productos")
 def Registros_Productos(x:Registro_Productos):
     try:
@@ -307,7 +307,7 @@ def Registros_Productos(x:Registro_Productos):
                        ,[Stock]
                        ,[Precio]
                        ,[EstadoCarrito])
-                        VALUES(%s,%s,%s,%s,%s,%s,0)
+                        VALUES(%s,%s,%s,%s,%s,%s)
                        '''
             cursor = conn.cursor()
             cursor.execute(consulta,datos)
@@ -358,16 +358,16 @@ def Producto_Categoria(Categoria_Producto:str):
     try:
         conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
         query="select * from Producto where Categoria_producto = '"+str(Categoria_Producto)+"'"
-        #query="select * from Detalle where IdUsuarios = '"+str(Categoria_Producto)+"'"
         cursor = conn.cursor(as_dict=True)
         cursor.execute(query)
         contenido = cursor.fetchall()
+        Variables.cantidad.clear()
         for i in contenido:
-            Variables.aux = i
-        if Variables.aux == {}:
+            Variables.cantidad.append(i)
+        if Variables.cantidad == []:
             return {"ok":False}
         else:
-            return Variables.aux
+            return Variables.cantidad
     except:
         "Error"
 
@@ -603,12 +603,13 @@ def Detalle_Carrito(IdUsuario):
         cursor = conn.cursor(as_dict=True)
         cursor.execute(query)
         contenido = cursor.fetchall()
+        Variables.cantidad.clear()
         for i in contenido:
-            Variables.aux = i
-        if Variables.aux == {}:
+            Variables.cantidad.append(i)
+        if Variables.cantidad == []:
             return {"ok":False}
         else:
-            return Variables.aux
+            return Variables.cantidad
     except:
         "Error"
 
