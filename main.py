@@ -545,6 +545,7 @@ def Borrar_Slides(IdSlider:str):
 @app.post("/api/Actualizar_Slides/{IdSlider}")
 def Actualizar_Slides(IdSlider:str, x:Registro_Slides):
     try:
+        conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
         datos = (x.Titulo, x.Recurso, IdSlider)
         consulta = '''UPDATE [dbo].[Slider] SET Titulo = %s, Recurso = %s WHERE IdSlider = %s'''
         cursor = conn.cursor()
