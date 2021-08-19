@@ -219,6 +219,7 @@ def Borrado_Usuarios(x:Borrar_Usuarios):
 @app.post("/api/Modificar_Usuarios/{Rol}")
 def Modificar_Usuarios(Rol:str, x:Borrar_Usuarios):
     try:
+        conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
         query= "Select Rol from Cliente_Usuario where IdUsuarios = '"+x.IdAdmin+"'"
         cursor = conn.cursor()
         cursor.execute(query)
