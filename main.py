@@ -1,3 +1,4 @@
+from Registrando_Carrito import Registro_Carrito
 from Borrando_Usuarios import Borrar_Usuarios
 from Registrando_Admins import Registro_Admins
 from fastapi import FastAPI
@@ -336,18 +337,39 @@ def Seleccionar_Todo():
 
 @app.get("/api/Seleccionar_Uno/{IdProducto}")
 def Seleccionar_Uno(IdProducto:str):
-    conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
-    query = "select * from Producto where IdProducto = '"+str(IdProducto)+"'"
-    cursor = conn.cursor(as_dict=True)
-    cursor.execute(query)
-    contenido = cursor.fetchall()
-    for i in contenido:
-        Variables.aux = i
+    try:
+        conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
+        query = "select * from Producto where IdProducto = '"+str(IdProducto)+"'"
+        cursor = conn.cursor(as_dict=True)
+        cursor.execute(query)
+        contenido = cursor.fetchall()
+        for i in contenido:
+            Variables.aux = i
         
-    if Variables.aux == {}:
-        return {"ok":False}
-    else:
-        return Variables.aux
+        if Variables.aux == {}:
+            return {"ok":False}
+        else:
+            return Variables.aux
+    except:
+        return "Error"
+
+@app.get("/api/Seleccion_Producto_Categoria/{Categoria_Producto}")
+def Producto_Categoria(Categoria_Producto:str):
+    try:
+        conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
+        query="select * from Producto where Categoria_producto = '"+str(Categoria_Producto)+"'"
+        #query="select * from Detalle where IdUsuarios = '"+str(Categoria_Producto)+"'"
+        cursor = conn.cursor(as_dict=True)
+        cursor.execute(query)
+        contenido = cursor.fetchall()
+        for i in contenido:
+            Variables.aux = i
+        if Variables.aux == {}:
+            return {"ok":False}
+        else:
+            return Variables.aux
+    except:
+        "Error"
 
 @app.get("/api/Borrar_Producto/{IdProducto}")
 def Borrar_Producto(IdProducto:str):
@@ -371,6 +393,8 @@ def Actualizar_Producto(IdProducto:str, z:Registro_Productos):
         return {"ok":True}
     except:
         return {"ok":False}
+
+
 #endregion
 
 #region CRUD DE CATEGORIAS
@@ -556,4 +580,36 @@ def Sacar_Cumpleaños(Mes:str):
             return {"ok":False}
     except:
         return "Error"
+#endregion
+
+#region CARRITO
+@app.post("/api/Registro_Carrito")
+def Registrar_Carrito(x:Registro_Carrito):
+    try:
+        conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
+        query = f"exec SP_Carrito {x.IdUsuarios},{x.IdProducto},'{x.Nombre_producto}','{x.Foto}','{x.Descripcion}','{x.Cantidad}','{x.Categoria}','{x.Suma_total}','{x.N_Stock}'"
+        cursor = conn.cursor()
+        cursor.execute(query)
+        conn.commit()
+        return {"ok":True}
+    except:
+        return {"ok":False}
+
+@app.get("/api/Detalles_Carrito/{IdUsuario}")
+def Detalle_Carrito(IdUsuario):
+    try:
+        conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
+        query="select * from Detalle where IdUsuarios = '"+str(IdUsuario)+"'"
+        cursor = conn.cursor(as_dict=True)
+        cursor.execute(query)
+        contenido = cursor.fetchall()
+        for i in contenido:
+            Variables.aux = i
+        if Variables.aux == {}:
+            return {"ok":False}
+        else:
+            return Variables.aux
+    except:
+        "Error"
+
 #endregion
