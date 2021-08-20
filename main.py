@@ -340,7 +340,7 @@ def Seleccionar_Todo():
                                     "Stock": i[5],
                                     "Precio": i[6],
                                     "Estado": i[7]})
-    return {"ok":True, "data":Variables.cantidad}
+    return Variables.cantidad
 
 @app.get("/api/Seleccionar_Uno/{IdProducto}")
 def Seleccionar_Uno(IdProducto:str):
@@ -478,6 +478,7 @@ def Borrar_Categoria(IdCategoria:str):
         return {"ok":True}
     except:
         return {"ok":False}
+
 
 @app.post("/api/Actualizar_Categoria/{IdCategoria}")
 def Actualizar_Categoria(IdCategoria:str, z:Registro_Categorias):
@@ -627,4 +628,47 @@ def Detalle_Carrito(IdUsuario):
     except:
         "Error"
 
+@app.get("/api/Detalles_Carrito/{IdUsuario}")
+def Detalle_Carrito(IdUsuario):
+    try:
+        conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
+        query="select * from Detalle where IdUsuarios = '"+str(IdUsuario)+"'"
+        cursor = conn.cursor(as_dict=True)
+        cursor.execute(query)
+        contenido = cursor.fetchall()
+        Variables.cantidad.clear()
+        for i in contenido:
+            Variables.cantidad.append(i)
+        if Variables.cantidad == []:
+            return {"ok":False}
+        else:
+            return Variables.cantidad
+    except:
+        "Error"
+
+
+@app.get("/api/Cantidad_Producto_Carrito/{IdUsuario}")
+def Cantidad_Producto_Carrito(IdUsuario):
+    try:
+        conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
+        cursor = conn.cursor()
+        cursor.execute("select COUNT(IdCarrito) as cantidad from Carrito where IdUsuarios = '"+str(IdUsuario)+"' GROUP BY IdUsuarios")
+        contenido = cursor.fetchall()
+        Variables.cantidad.clear()
+        for i in contenido:
+            Variables.cantidad = i[0]
+        if Variables.cantidad == []:
+            return {"ok":False}
+        else:
+            return {"ok":True,"Cantidad":Variables.cantidad}
+    except:
+        "Error"
+
 #endregion
+
+
+
+
+
+
+
