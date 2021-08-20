@@ -690,6 +690,19 @@ def Agregar_Pedidos(s:Registro_Pedidos):
          return {"ok":False}
 
 
+@app.post("/api/Eliminar_producto_carrito/{idProducto}")
+def Eliminar_producto_carrito(idProducto:str):
+    try:
+        conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM Detalle WHERE idProducto = '"+str(idProducto)+"'")
+        conn.commit()
+        return {"ok":True}
+    except:
+         return {"ok":False}
+
+
+
 #endregion
 
 
