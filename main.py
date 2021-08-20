@@ -340,7 +340,7 @@ def Seleccionar_Todo():
                                     "Stock": i[5],
                                     "Precio": i[6],
                                     "Estado": i[7]})
-    return Variables.cantidad
+    return {"ok":True, "data":Variables.cantidad}
 
 @app.get("/api/Seleccionar_Uno/{IdProducto}")
 def Seleccionar_Uno(IdProducto:str):
