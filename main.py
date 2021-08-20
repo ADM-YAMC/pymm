@@ -14,6 +14,7 @@ from Logout import logout
 from Registrando_Categorias import Registro_Categorias
 from Registrando_Productos import Registro_Productos
 from Registrando_Slides import Registro_Slides
+from Pedidos import Registro_Pedidos
 import pymssql
 
 app = FastAPI()
@@ -663,6 +664,31 @@ def Cantidad_Producto_Carrito(IdUsuario):
             return {"ok":True,"Cantidad":Variables.cantidad}
     except:
         "Error"
+
+
+
+@app.post("/api/Agregar_Pedidos")
+def Agregar_Pedidos(s:Registro_Pedidos):
+    try:
+        conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
+        cursor = conn.cursor()
+        Datos = (s.IdUsuario,s.Telefono,s.Total,s.Direccion,s.Latitud,s.Longitud)
+        query = '''INSERT INTO [dbo].[Pedidos]
+                    ([IdUsuarios]
+                    ,[Telefono]
+                    ,[Total]
+                    ,[Direccion]
+                    ,[Latitud]
+                    ,[Longitud]
+                    ,[Estado])
+                VALUES
+                    (%s,%s,%s,%s,%s,%s,'En proceso')'''
+        cursor.execute(query,Datos)
+        conn.commit()
+        return {"ok":True}
+    except:
+         return {"ok":False}
+
 
 #endregion
 
