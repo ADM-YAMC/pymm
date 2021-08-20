@@ -315,7 +315,7 @@ def Registros_Productos(x:Registro_Productos):
                        ,[Stock]
                        ,[Precio]
                        ,[EstadoCarrito])
-                        VALUES(%s,%s,%s,%s,%s,%s)
+                        VALUES(%s,%s,%s,%s,%s,%s,'0')
                        '''
             cursor = conn.cursor()
             cursor.execute(consulta,datos)
