@@ -374,7 +374,7 @@ def Producto_Categoria(Categoria_Producto:str):
         if Variables.cantidad == []:
             return {"ok":False}
         else:
-            return Variables.cantidad
+            return {"ok":True, "data":Variables.cantidad}
     except:
         "Error"
 
