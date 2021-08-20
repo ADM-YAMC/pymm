@@ -641,7 +641,7 @@ def Detalle_Carrito(IdUsuario):
     try:
         Lista=[]
         conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
-        query="select * from Detalle where IdUsuarios = '"+str(IdUsuario)+"'"
+        query="select * from Detalle where IdUsuarios = '"+str(IdUsuario)+"' and Estado = 0"
         cursor = conn.cursor(as_dict=True)
         cursor.execute(query)
         contenido = cursor.fetchall()
@@ -718,7 +718,7 @@ def Seleccionar_Pedidos():
         Lista = []
         conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
         cursor = conn.cursor(as_dict=True)
-        cursor.execute("select * from Pedidos")
+        cursor.execute("select p.*, u.Nombre, u.Apellido, u.Correo from Pedidos as p inner join Cliente_Usuario as u on p.IdUsuarios = u.IdUsuarios")
         contenido = cursor.fetchall()
        # Variables.cantidad.clear()
         for i in contenido:
