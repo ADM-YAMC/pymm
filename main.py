@@ -14,7 +14,7 @@ from Logout import logout
 from Registrando_Categorias import Registro_Categorias
 from Registrando_Productos import Registro_Productos
 from Registrando_Slides import Registro_Slides
-from Pedidos import Registro_Pedidos
+from Pedidos import Actualizar_Pedidos, Registro_Pedidos
 import pymssql
 
 app = FastAPI()
@@ -770,11 +770,14 @@ def Cantidad_Productos(IdUsuario:str):
     except:
         return "Error"
 
+@app.post("/api/Actualizar_Pedidos")
+def Filtro_Por_Usuario(x:Actualizar_Pedidos):
+    try:
+        conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI') 
+        cursor = conn.cursor()
+        cursor.execute("UPDATE [dbo].[Pedidos] SET Estado = '"+x.Estado+"' WHERE IdOrden = "+str(x.IdOrden)+"")
+        conn.commit()
+        return {"ok":True}
+    except:
+        return {"ok":False}
 #endregion
-
-
-
-
-
-
-

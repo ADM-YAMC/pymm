@@ -7,3 +7,7 @@ class Registro_Pedidos(BaseModel):
     Direccion:str
     Latitud:str
     Longitud:str
+
+class Actualizar_Pedidos(BaseModel):
+    IdOrden:int
+    Estado:str
