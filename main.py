@@ -734,6 +734,24 @@ def Seleccionar_Pedidos():
     except:
         return {"ok":False}
 
+@app.get("/api/Seleccionar_Pedidos_Usuario/{IdUsuario}")
+def Seleccionar_Pedidos_Usuario(IdUsuario:str):
+    try:
+        Lista = []
+        conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
+        cursor = conn.cursor(as_dict=True)
+        cursor.execute("select p.*, u.Nombre, u.Apellido, u.Correo from Pedidos as p inner join Cliente_Usuario as u on p.IdUsuarios = u.IdUsuarios where u.IdUsuarios = '"+str(IdUsuario)+"'")
+        contenido = cursor.fetchall()
+       # Variables.cantidad.clear()
+        for i in contenido:
+            Lista.append(i)
+        if Lista == []:
+            return {"ok":False}
+        else:
+            return {"ok":True, "data":Lista}
+    except:
+        return {"ok":False}
+
 @app.get("/api/CantidadProductos/{IdUsuario}")
 def Cantidad_Productos(IdUsuario:str):
     try:
