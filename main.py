@@ -326,14 +326,15 @@ def Registros_Productos(x:Registro_Productos):
 
 @app.get("/api/Seleccionar_Todo")
 def Seleccionar_Todo():
+    Lista = []
     query = "select * from Producto"
     conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
     cursor = conn.cursor()
     cursor.execute(query)
     contenido = cursor.fetchall()
-    Variables.cantidad.clear()
+    #Variables.cantidad.clear()
     for i in contenido:
-        Variables.cantidad.append({"IdProducto": i[0],
+        Lista.append({"IdProducto": i[0],
                                     "Nombre_producto": i[1],
                                     "Categoria_producto": i[2],
                                     "Foto_producto": i[3],
@@ -341,7 +342,8 @@ def Seleccionar_Todo():
                                     "Stock": i[5],
                                     "Precio": i[6],
                                     "Estado": i[7]})
-    return {"ok":True, "data":Variables.cantidad}
+
+    return {"ok":True, "data":Lista}
 
 @app.get("/api/Seleccionar_Uno/{IdProducto}")
 def Seleccionar_Uno(IdProducto:str):
@@ -364,18 +366,19 @@ def Seleccionar_Uno(IdProducto:str):
 @app.get("/api/Seleccion_Producto_Categoria/{Categoria_Producto}")
 def Producto_Categoria(Categoria_Producto:str):
     try:
+        Lista = []
         conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
         query="select * from Producto where Categoria_producto = '"+str(Categoria_Producto)+"'"
         cursor = conn.cursor(as_dict=True)
         cursor.execute(query)
         contenido = cursor.fetchall()
-        Variables.cantidad.clear()
+        #Variables.cantidad.clear()
         for i in contenido:
-            Variables.cantidad.append(i)
-        if Variables.cantidad == []:
+            Lista.append(i)
+        if Lista == []:
             return {"ok":False}
         else:
-            return {"ok":True, "data":Variables.cantidad}
+            return {"ok":True, "data":Lista}
     except:
         "Error"
 
@@ -436,17 +439,18 @@ def Registro_Categoria(x:Registro_Categorias):
 @app.get("/api/Mostrar_Todas_Categoria")
 def Seleccionar_Todas_Categorias():
     try:
+        Lista = []
         query = "select * from  Categoria"
         conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
         cursor = conn.cursor()
         cursor.execute(query)
         contenido = cursor.fetchall()
-        Variables.cantidad.clear()
+        #Variables.cantidad.clear()
         for i in contenido:
-            Variables.cantidad.append({"IdCategoria": i[0],
+            Lista.append({"IdCategoria": i[0],
                                         "Nombre_Categoria": i[1]})
 
-        return Variables.cantidad
+        return Lista
     except:
         return {"ok":False}
 
@@ -529,18 +533,19 @@ def Mostrar_Un_Slide(IdSlider:str):
 
 @app.get("/api/Mostrar_Todos_Slides")
 def Mostrar_Todos_Slides():
+    Lista=[]
     query = "select * from Slider"
     conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
     cursor = conn.cursor()
     cursor.execute(query)
     contenido = cursor.fetchall()
-    Variables.cantidad.clear()
+    #Variables.cantidad.clear()
     for i in contenido:
-        Variables.cantidad.append({"IdSlider": i[0],
+        Lista.append({"IdSlider": i[0],
                                     "Titulo": i[1],
                                     "Recurso": i[2]})
     if Variables.cantidad.count != 0:
-        return Variables.cantidad
+        return Lista
     else:
         return {"ok":False}
 
@@ -574,24 +579,25 @@ def Actualizar_Slides(IdSlider:str, x:Registro_Slides):
 @app.get("/api/Sacar_Cumpleaños/{Mes}")
 def Sacar_Cumpleaños(Mes:str):
     try:
+        Lista=[]
         query = "select * from  Cliente_Usuario"
         conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
         cursor = conn.cursor()
         cursor.execute(query)
         contenido = cursor.fetchall()
-        Variables.cantidad.clear()
+        #Variables.cantidad.clear()
         for i in contenido:
             x = i[3]
             aux = x[3] + x[4]
             if aux == Mes:
-                Variables.cantidad.append({"IdUsuario": i[0],
+               Lista.append({"IdUsuario": i[0],
                                     "Nombre_Usuario": i[1],
                                     "Apellido": i[2],
                                     "Fecha_Nacimiento": i[3],
                                     "Correo": i[4],
                                     "Rol": i[6]})
-        if Variables.cantidad != []:
-            return Variables.cantidad
+        if Lista != []:
+            return Lista
         else:
             return {"ok":False}
     except:
@@ -614,36 +620,38 @@ def Registrar_Carrito(x:Registro_Carrito):
 @app.get("/api/Detalles_Carrito/{IdUsuario}")
 def Detalle_Carrito(IdUsuario):
     try:
+        Lista=[]
         conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
         query="select * from Detalle where IdUsuarios = '"+str(IdUsuario)+"'"
         cursor = conn.cursor(as_dict=True)
         cursor.execute(query)
         contenido = cursor.fetchall()
-        Variables.cantidad.clear()
+        #Variables.cantidad.clear()
         for i in contenido:
-            Variables.cantidad.append(i)
-        if Variables.cantidad == []:
+            Lista.append(i)
+        if Lista == []:
             return {"ok":False}
         else:
-            return Variables.cantidad
+            return Lista
     except:
         "Error"
 
 @app.get("/api/Detalles_Carrito/{IdUsuario}")
 def Detalle_Carrito(IdUsuario):
     try:
+        Lista=[]
         conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
         query="select * from Detalle where IdUsuarios = '"+str(IdUsuario)+"'"
         cursor = conn.cursor(as_dict=True)
         cursor.execute(query)
         contenido = cursor.fetchall()
-        Variables.cantidad.clear()
+       # Variables.cantidad.clear()
         for i in contenido:
-            Variables.cantidad.append(i)
-        if Variables.cantidad == []:
+            Lista.append(i)
+        if Lista == []:
             return {"ok":False}
         else:
-            return Variables.cantidad
+            return Lista
     except:
         "Error"
 
@@ -651,17 +659,18 @@ def Detalle_Carrito(IdUsuario):
 @app.get("/api/Cantidad_Producto_Carrito/{IdUsuario}")
 def Cantidad_Producto_Carrito(IdUsuario):
     try:
+        Lista=[]
         conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
         cursor = conn.cursor()
         cursor.execute("select COUNT(IdCarrito) as cantidad from Carrito where IdUsuarios = '"+str(IdUsuario)+"' GROUP BY IdUsuarios")
         contenido = cursor.fetchall()
-        Variables.cantidad.clear()
+        #Variables.cantidad.clear()
         for i in contenido:
-            Variables.cantidad = i[0]
-        if Variables.cantidad == []:
+            Lista = i[0]
+        if Lista == []:
             return {"ok":False}
         else:
-            return {"ok":True,"Cantidad":Variables.cantidad}
+            return {"ok":True,"Cantidad":Lista}
     except:
         "Error"
 
