@@ -712,6 +712,26 @@ def Eliminar_producto_carrito(idProducto:str):
 
 
 
+@app.get("/api/Seleccionar_Pedidos")
+def Seleccionar_Pedidos():
+    try:
+        Lista = []
+        conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
+        cursor = conn.cursor(as_dict=True)
+        cursor.execute("select * from Pedidos")
+        contenido = cursor.fetchall()
+       # Variables.cantidad.clear()
+        for i in contenido:
+            Lista.append(i)
+        if Lista == []:
+            return {"ok":False}
+        else:
+            return {"ok":True, "data":Lista}
+    except:
+        return {"ok":False}
+
+
+
 #endregion
 
 
