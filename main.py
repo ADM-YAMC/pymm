@@ -639,6 +639,26 @@ def Detalle_Carrito(IdUsuario:str):
         return"Error"
 
 
+@app.get("/api/Detalles_Carrito_Producto_Pagado/{IdUsuario}")
+def Detalles_Carrito_Producto_Pagado(IdUsuario:str):
+    try:
+        Lista=[]
+        conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
+        query="select * from Detalle where IdUsuarios = '"+str(IdUsuario)+"' and Estado = '1'"
+        cursor = conn.cursor(as_dict=True)
+        cursor.execute(query)
+        contenido = cursor.fetchall()
+       # Variables.cantidad.clear()
+        for i in contenido:
+            Lista.append(i)
+        if Lista == []:
+            return {"ok":False}
+        else:
+            return {"ok":True, "data":Lista}
+    except:
+        return"Error"
+
+
 @app.get("/api/Cantidad_Producto_Carrito/{IdUsuario}")
 def Cantidad_Producto_Carrito(IdUsuario):
     try:
