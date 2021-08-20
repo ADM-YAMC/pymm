@@ -617,31 +617,14 @@ def Registrar_Carrito(x:Registro_Carrito):
     except:
         return {"ok":False}
 
-@app.get("/api/Detalles_Carrito/{IdUsuario}")
-def Detalle_Carrito(IdUsuario):
-    try:
-        Lista=[]
-        conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
-        query="select * from Detalle where IdUsuarios = '"+str(IdUsuario)+"'"
-        cursor = conn.cursor(as_dict=True)
-        cursor.execute(query)
-        contenido = cursor.fetchall()
-        #Variables.cantidad.clear()
-        for i in contenido:
-            Lista.append(i)
-        if Lista == []:
-            return {"ok":False}
-        else:
-            return Lista
-    except:
-        "Error"
+
 
 @app.get("/api/Detalles_Carrito/{IdUsuario}")
-def Detalle_Carrito(IdUsuario):
+def Detalle_Carrito(IdUsuario:str):
     try:
         Lista=[]
         conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
-        query="select * from Detalle where IdUsuarios = '"+str(IdUsuario)+"' and Estado = 0"
+        query="select * from Detalle where IdUsuarios = '"+str(IdUsuario)+"' and Estado = '0'"
         cursor = conn.cursor(as_dict=True)
         cursor.execute(query)
         contenido = cursor.fetchall()
@@ -651,9 +634,9 @@ def Detalle_Carrito(IdUsuario):
         if Lista == []:
             return {"ok":False}
         else:
-            return Lista
+            return {"ok":True, "data":Lista}
     except:
-        "Error"
+        return"Error"
 
 
 @app.get("/api/Cantidad_Producto_Carrito/{IdUsuario}")
