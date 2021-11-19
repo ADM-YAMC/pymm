@@ -178,20 +178,29 @@ def Registro_Administradores(IdAdmin:str, u:Registro_Admins):
         if Variables.aux3 != "SuperAdmin":
             return {"ok": False}
         else:
-            Datos = (u.Nombre,u.Apellido,u.Fecha_Nacimiento,u.Correo,u.Contraseña, "Administrador")
-            consulta = '''INSERT INTO [dbo].[Cliente_Usuario]
-                ([Nombre]
-                ,[Apellido]
-                ,[Fecha_Nacimiento]
-                ,[Correo]
-                ,[Contraseña]
-                ,[Rol])
-                VALUES
-                (%s,%s,%s,%s,%s,%s)'''
+            query= "Select Correo from Cliente_Usuario where Correo = '"+u.Correo+"'"
             cursor = conn.cursor()
-            cursor.execute(consulta,Datos)
-            conn.commit()
-            return {"ok":True}
+            cursor.execute(query)
+            contenido = cursor.fetchall()
+            for i in contenido:
+                Variables.aux3 = i[0]
+            if Variables.aux3 == u.Correo:
+                return {"ok": False}
+            else:
+                Datos = (u.Nombre,u.Apellido,u.Fecha_Nacimiento,u.Correo,u.Contraseña, "Administrador")
+                consulta = '''INSERT INTO [dbo].[Cliente_Usuario]
+                    ([Nombre]
+                    ,[Apellido]
+                    ,[Fecha_Nacimiento]
+                    ,[Correo]
+                    ,[Contraseña]
+                    ,[Rol])
+                    VALUES
+                    (%s,%s,%s,%s,%s,%s)'''
+                cursor = conn.cursor()
+                cursor.execute(consulta,Datos)
+                conn.commit()
+                return {"ok":True}
     except:
         return "Error"
 
