@@ -31,7 +31,7 @@ app.add_middleware(
 @app.get("/")
 def read_root():
     try:
-        conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
+        conn = pymssql.connect('DBAPIFusion.mssql.somee.com', 'ADM-YAMC_SQLLogin_1', 'z6ugdren8j', 'DBAPIFusion')
         cursor = conn.cursor()
         cursor.execute("update  [dbo].[Prueba] set Nombre = 'Vicente' where Nombre = 'Yunior'")
         lista = []
@@ -49,7 +49,7 @@ def read_root():
 @app.get("/api/Mostrar_Usuarios")
 def Mostrar_Usuarios():
     query = "select * from  Cliente_Usuario"
-    conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
+    conn = pymssql.connect('DBAPIFusion.mssql.somee.com', 'ADM-YAMC_SQLLogin_1', 'z6ugdren8j', 'DBAPIFusion')
     cursor = conn.cursor()
     cursor.execute(query)
     contenido = cursor.fetchall()
@@ -70,7 +70,7 @@ def Mostrar_Conectados():
     try:
         query = "select COUNT(IdUsuarios) as Conectados from Cliente_Usuario where Token <> 'NULL'"
         query2 = "select COUNT(IdUsuarios) as Conectados from Cliente_Usuario where Token = 'NULL'"
-        conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
+        conn = pymssql.connect('DBAPIFusion.mssql.somee.com', 'ADM-YAMC_SQLLogin_1', 'z6ugdren8j', 'DBAPIFusion')
         cursor = conn.cursor()
         cursor.execute(query)
         contenido = cursor.fetchall()
@@ -91,7 +91,7 @@ def Login(a:logout):
     try:
         contentt = {}
         token = secrets.token_hex(80)
-        conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
+        conn = pymssql.connect('DBAPIFusion.mssql.somee.com', 'ADM-YAMC_SQLLogin_1', 'z6ugdren8j', 'DBAPIFusion')
         query = "select * from Cliente_Usuario where Correo = '"+a.Correo+"' and Contraseña = '"+a.Contraseña+"'"
         cursor = conn.cursor()
         cursor.execute(query)
@@ -126,7 +126,7 @@ def Login(a:logout):
 @app.get("/api/Relogin/{Token}")
 def ReLogin(Token:str):
     contentt = {}
-    conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
+    conn = pymssql.connect('DBAPIFusion.mssql.somee.com', 'ADM-YAMC_SQLLogin_1', 'z6ugdren8j', 'DBAPIFusion')
     query = "select * from Cliente_Usuario where Token = '"+str(Token)+"'"
     cursor = conn.cursor()
     cursor.execute(query)
@@ -153,7 +153,7 @@ def ReLogin(Token:str):
 @app.post("/api/CerrarSesion/{idUser}")
 def CerrarSesion(idUser:str):
     try:
-        conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
+        conn = pymssql.connect('DBAPIFusion.mssql.somee.com', 'ADM-YAMC_SQLLogin_1', 'z6ugdren8j', 'DBAPIFusion')
         cursor = conn.cursor()
         update = "UPDATE [dbo].[Cliente_Usuario] SET Token = 'NULL' WHERE IdUsuarios = '"+str(idUser)+"'"
         cursor.execute(update)
@@ -168,7 +168,7 @@ def CerrarSesion(idUser:str):
 @app.post("/api/Registro_Admins/{IdAdmin}")
 def Registro_Administradores(IdAdmin:str, u:Registro_Admins):
     try:
-        conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
+        conn = pymssql.connect('DBAPIFusion.mssql.somee.com', 'ADM-YAMC_SQLLogin_1', 'z6ugdren8j', 'DBAPIFusion')
         query= "Select Rol from Cliente_Usuario where IdUsuarios = '"+str(IdAdmin)+"'"
         cursor = conn.cursor()
         cursor.execute(query)
@@ -207,7 +207,7 @@ def Registro_Administradores(IdAdmin:str, u:Registro_Admins):
 @app.post("/api/Borrar_Usuarios")
 def Borrado_Usuarios(x:Borrar_Usuarios):
     try:
-        conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
+        conn = pymssql.connect('DBAPIFusion.mssql.somee.com', 'ADM-YAMC_SQLLogin_1', 'z6ugdren8j', 'DBAPIFusion')
         query= "Select Rol from Cliente_Usuario where IdUsuarios = '"+x.IdAdmin+"'"
         cursor = conn.cursor()
         cursor.execute(query)
@@ -232,7 +232,7 @@ def Borrado_Usuarios(x:Borrar_Usuarios):
 @app.post("/api/Modificar_Usuarios/{Rol}")
 def Modificar_Usuarios(Rol:str, x:Borrar_Usuarios):
     try:
-        conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
+        conn = pymssql.connect('DBAPIFusion.mssql.somee.com', 'ADM-YAMC_SQLLogin_1', 'z6ugdren8j', 'DBAPIFusion')
         query= "Select Rol from Cliente_Usuario where IdUsuarios = '"+x.IdAdmin+"'"
         cursor = conn.cursor()
         cursor.execute(query)
@@ -254,7 +254,7 @@ def Modificar_Usuarios(Rol:str, x:Borrar_Usuarios):
 @app.post("/api/Registro_Usuarios")
 def Registro_Usuarios(u:Usuarios):
     try:
-        conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
+        conn = pymssql.connect('DBAPIFusion.mssql.somee.com', 'ADM-YAMC_SQLLogin_1', 'z6ugdren8j', 'DBAPIFusion')
         query= "Select Correo from Cliente_Usuario where Correo = '"+u.Correo+"'"
         cursor = conn.cursor()
         cursor.execute(query)
@@ -283,7 +283,7 @@ def Registro_Usuarios(u:Usuarios):
 
 @app.post("/api/Actualizar_Clave_Usuario/{ClaveNueva}")
 def Actualizar_Clave_Usuario(a:logout, ClaveNueva:str):
-    conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
+    conn = pymssql.connect('DBAPIFusion.mssql.somee.com', 'ADM-YAMC_SQLLogin_1', 'z6ugdren8j', 'DBAPIFusion')
     query = "select * from Cliente_Usuario where Correo = '"+a.Correo+"' and Contraseña = '"+a.Contraseña+"'"
     cursor = conn.cursor()
     cursor.execute(query)
@@ -305,7 +305,7 @@ def Actualizar_Clave_Usuario(a:logout, ClaveNueva:str):
 @app.post("/api/Registro_Productos")
 def Registros_Productos(x:Registro_Productos):
     try:
-        conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
+        conn = pymssql.connect('DBAPIFusion.mssql.somee.com', 'ADM-YAMC_SQLLogin_1', 'z6ugdren8j', 'DBAPIFusion')
         query = "select Nombre_producto from Producto where Nombre_Producto = '"+str(x.Nombre_producto)+"'"
         cursor = conn.cursor()
         cursor.execute(query)
@@ -337,7 +337,7 @@ def Registros_Productos(x:Registro_Productos):
 def Seleccionar_Todo():
     Lista = []
     query = "select * from Producto"
-    conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
+    conn = pymssql.connect('DBAPIFusion.mssql.somee.com', 'ADM-YAMC_SQLLogin_1', 'z6ugdren8j', 'DBAPIFusion')
     cursor = conn.cursor()
     cursor.execute(query)
     contenido = cursor.fetchall()
@@ -358,7 +358,7 @@ def Seleccionar_Todo():
 @app.get("/api/Seleccionar_Uno/{IdProducto}")
 def Seleccionar_Uno(IdProducto:str):
     try:
-        conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
+        conn = pymssql.connect('DBAPIFusion.mssql.somee.com', 'ADM-YAMC_SQLLogin_1', 'z6ugdren8j', 'DBAPIFusion')
         query = "select * from Producto where IdProducto = '"+str(IdProducto)+"'"
         cursor = conn.cursor(as_dict=True)
         cursor.execute(query)
@@ -377,7 +377,7 @@ def Seleccionar_Uno(IdProducto:str):
 def Producto_Categoria(Categoria_Producto:str):
     try:
         Lista = []
-        conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
+        conn = pymssql.connect('DBAPIFusion.mssql.somee.com', 'ADM-YAMC_SQLLogin_1', 'z6ugdren8j', 'DBAPIFusion')
         query="select * from Producto where Categoria_producto = '"+str(Categoria_Producto)+"'"
         cursor = conn.cursor(as_dict=True)
         cursor.execute(query)
@@ -395,7 +395,7 @@ def Producto_Categoria(Categoria_Producto:str):
 @app.get("/api/Borrar_Producto/{IdProducto}")
 def Borrar_Producto(IdProducto:str):
     try:
-        conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
+        conn = pymssql.connect('DBAPIFusion.mssql.somee.com', 'ADM-YAMC_SQLLogin_1', 'z6ugdren8j', 'DBAPIFusion')
         query = "delete from Producto where IdProducto = '"+str(IdProducto)+"'"
         cursor = conn.cursor()
         cursor.execute(query)
@@ -407,7 +407,7 @@ def Borrar_Producto(IdProducto:str):
 @app.post("/api/Actualizar_Producto/{IdProducto}")
 def Actualizar_Producto(IdProducto:str, z:Registro_Productos):
     try:
-        conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
+        conn = pymssql.connect('DBAPIFusion.mssql.somee.com', 'ADM-YAMC_SQLLogin_1', 'z6ugdren8j', 'DBAPIFusion')
         datos = (z.Nombre_producto, z.Categoria_producto, z.Foto_producto, z.Descripcion_producto, z.Stock, z.Precio, IdProducto)
         consulta = '''UPDATE [dbo].[Producto] SET Nombre_producto = %s, Categoria_producto = %s, Foto_producto = %s, Descripcion_producto = %s, Stock = %s, Precio = %s WHERE IdProducto = %s'''
         cursor = conn.cursor()
@@ -424,7 +424,7 @@ def Actualizar_Producto(IdProducto:str, z:Registro_Productos):
 @app.post("/api/Registro_Categorias")
 def Registro_Categoria(x:Registro_Categorias):
     try:
-        conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
+        conn = pymssql.connect('DBAPIFusion.mssql.somee.com', 'ADM-YAMC_SQLLogin_1', 'z6ugdren8j', 'DBAPIFusion')
         query = "select Nombre_Categoria from Categoria where Nombre_Categoria = '"+str(x.Nombre_categoria)+"'"
         cursor = conn.cursor()
         cursor.execute(query)
@@ -451,7 +451,7 @@ def Seleccionar_Todas_Categorias():
     try:
         Lista = []
         query = "select * from  Categoria"
-        conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
+        conn = pymssql.connect('DBAPIFusion.mssql.somee.com', 'ADM-YAMC_SQLLogin_1', 'z6ugdren8j', 'DBAPIFusion')
         cursor = conn.cursor()
         cursor.execute(query)
         contenido = cursor.fetchall()
@@ -467,7 +467,7 @@ def Seleccionar_Todas_Categorias():
 @app.get("/api/Mostrar_Una_Categoria/{IdCategoria}")
 def Seleccionar_Una_Categoria(IdCategoria:str):
     try:
-        conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
+        conn = pymssql.connect('DBAPIFusion.mssql.somee.com', 'ADM-YAMC_SQLLogin_1', 'z6ugdren8j', 'DBAPIFusion')
         query = "select * from Categoria where IdCategoria = '"+str(IdCategoria)+"'"
         cursor = conn.cursor(as_dict=True)
         cursor.execute(query)
@@ -485,7 +485,7 @@ def Seleccionar_Una_Categoria(IdCategoria:str):
 @app.get("/api/Borrar_Categoria/{IdCategoria}")
 def Borrar_Categoria(IdCategoria:str):
     try:
-        conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
+        conn = pymssql.connect('DBAPIFusion.mssql.somee.com', 'ADM-YAMC_SQLLogin_1', 'z6ugdren8j', 'DBAPIFusion')
         query = "delete from Categoria where IdCategoria = '"+str(IdCategoria)+"'"
         cursor = conn.cursor()
         cursor.execute(query)
@@ -498,7 +498,7 @@ def Borrar_Categoria(IdCategoria:str):
 @app.post("/api/Actualizar_Categoria/{IdCategoria}")
 def Actualizar_Categoria(IdCategoria:str, z:Registro_Categorias):
     try:
-        conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
+        conn = pymssql.connect('DBAPIFusion.mssql.somee.com', 'ADM-YAMC_SQLLogin_1', 'z6ugdren8j', 'DBAPIFusion')
         datos = (z.Nombre_categoria, IdCategoria)
         consulta = '''UPDATE [dbo].[Categoria] SET Nombre_Categoria = %s WHERE IdCategoria = %s'''
         cursor = conn.cursor()
@@ -513,7 +513,7 @@ def Actualizar_Categoria(IdCategoria:str, z:Registro_Categorias):
 @app.post("/api/Registrar_Slides")
 def Registrar_Slides(x:Registro_Slides):
     try:
-        conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
+        conn = pymssql.connect('DBAPIFusion.mssql.somee.com', 'ADM-YAMC_SQLLogin_1', 'z6ugdren8j', 'DBAPIFusion')
         Datos = (x.Titulo, x.Recurso)
         consulta = '''INSERT INTO [dbo].[Slider]
             ([Titulo]
@@ -530,7 +530,7 @@ def Registrar_Slides(x:Registro_Slides):
 @app.get("/api/Mostrar_Un_Slide/{IdSlider}")
 def Mostrar_Un_Slide(IdSlider:str):
     query = "select * from Slider where IdSlider = '"+str(IdSlider)+"'"
-    conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
+    conn = pymssql.connect('DBAPIFusion.mssql.somee.com', 'ADM-YAMC_SQLLogin_1', 'z6ugdren8j', 'DBAPIFusion')
     cursor = conn.cursor()
     cursor.execute(query)
     contenido = cursor.fetchall()
@@ -545,7 +545,7 @@ def Mostrar_Un_Slide(IdSlider:str):
 def Mostrar_Todos_Slides():
     Lista=[]
     query = "select * from Slider"
-    conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
+    conn = pymssql.connect('DBAPIFusion.mssql.somee.com', 'ADM-YAMC_SQLLogin_1', 'z6ugdren8j', 'DBAPIFusion')
     cursor = conn.cursor()
     cursor.execute(query)
     contenido = cursor.fetchall()
@@ -563,7 +563,7 @@ def Mostrar_Todos_Slides():
 def Borrar_Slides(IdSlider:str):
     try:
         query = "delete from Slider where IdSlider = '"+str(IdSlider)+"'"
-        conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
+        conn = pymssql.connect('DBAPIFusion.mssql.somee.com', 'ADM-YAMC_SQLLogin_1', 'z6ugdren8j', 'DBAPIFusion')
         cursor = conn.cursor()
         cursor.execute(query)
         conn.commit()
@@ -574,7 +574,7 @@ def Borrar_Slides(IdSlider:str):
 @app.post("/api/Actualizar_Slides/{IdSlider}")
 def Actualizar_Slides(IdSlider:str, x:Registro_Slides):
     try:
-        conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
+        conn = pymssql.connect('DBAPIFusion.mssql.somee.com', 'ADM-YAMC_SQLLogin_1', 'z6ugdren8j', 'DBAPIFusion')
         datos = (x.Titulo, x.Recurso, IdSlider)
         consulta = '''UPDATE [dbo].[Slider] SET Titulo = %s, Recurso = %s WHERE IdSlider = %s'''
         cursor = conn.cursor()
@@ -591,7 +591,7 @@ def Sacar_Cumpleaños(Mes:str):
     try:
         Lista=[]
         query = "select * from  Cliente_Usuario"
-        conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
+        conn = pymssql.connect('DBAPIFusion.mssql.somee.com', 'ADM-YAMC_SQLLogin_1', 'z6ugdren8j', 'DBAPIFusion')
         cursor = conn.cursor()
         cursor.execute(query)
         contenido = cursor.fetchall()
@@ -618,7 +618,7 @@ def Sacar_Cumpleaños(Mes:str):
 @app.post("/api/Registro_Carrito")
 def Registrar_Carrito(x:Registro_Carrito):
     try:
-        conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
+        conn = pymssql.connect('DBAPIFusion.mssql.somee.com', 'ADM-YAMC_SQLLogin_1', 'z6ugdren8j', 'DBAPIFusion')
         query = f"exec SP_Carrito {x.IdUsuarios},{x.IdProducto},'{x.Nombre_producto}','{x.Foto}','{x.Descripcion}','{x.Cantidad}','{x.Categoria}','{x.Suma_total}','{x.N_Stock}'"
         cursor = conn.cursor()
         cursor.execute(query)
@@ -633,7 +633,7 @@ def Registrar_Carrito(x:Registro_Carrito):
 def Detalle_Carrito(IdUsuario:str):
     try:
         Lista=[]
-        conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
+        conn = pymssql.connect('DBAPIFusion.mssql.somee.com', 'ADM-YAMC_SQLLogin_1', 'z6ugdren8j', 'DBAPIFusion')
         query="select * from Detalle where IdUsuarios = '"+str(IdUsuario)+"' and Estado = '0'"
         cursor = conn.cursor(as_dict=True)
         cursor.execute(query)
@@ -653,7 +653,7 @@ def Detalle_Carrito(IdUsuario:str):
 def Detalles_Carrito_Producto_Pagado(IdUsuario:str):
     try:
         Lista=[]
-        conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
+        conn = pymssql.connect('DBAPIFusion.mssql.somee.com', 'ADM-YAMC_SQLLogin_1', 'z6ugdren8j', 'DBAPIFusion')
         query="select * from Detalle where IdUsuarios = '"+str(IdUsuario)+"' and Estado = '1'"
         cursor = conn.cursor(as_dict=True)
         cursor.execute(query)
@@ -673,7 +673,7 @@ def Detalles_Carrito_Producto_Pagado(IdUsuario:str):
 def Cantidad_Producto_Carrito(IdUsuario):
     try:
         Lista=[]
-        conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
+        conn = pymssql.connect('DBAPIFusion.mssql.somee.com', 'ADM-YAMC_SQLLogin_1', 'z6ugdren8j', 'DBAPIFusion')
         cursor = conn.cursor()
         cursor.execute("select COUNT(IdCarrito) as cantidad from Carrito where IdUsuarios = '"+str(IdUsuario)+"' GROUP BY IdUsuarios")
         contenido = cursor.fetchall()
@@ -692,7 +692,7 @@ def Cantidad_Producto_Carrito(IdUsuario):
 @app.post("/api/Agregar_Pedidos")
 def Agregar_Pedidos(s:Registro_Pedidos):
     try:
-        conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
+        conn = pymssql.connect('DBAPIFusion.mssql.somee.com', 'ADM-YAMC_SQLLogin_1', 'z6ugdren8j', 'DBAPIFusion')
         cursor = conn.cursor()
         Datos = (s.IdUsuario,s.Telefono,s.Total,s.Direccion,s.Latitud,s.Longitud)
         query = '''INSERT INTO [dbo].[Pedidos]
@@ -715,7 +715,7 @@ def Agregar_Pedidos(s:Registro_Pedidos):
 @app.post("/api/Eliminar_producto_carrito/{idProducto}")
 def Eliminar_producto_carrito(idProducto:str):
     try:
-        conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
+        conn = pymssql.connect('DBAPIFusion.mssql.somee.com', 'ADM-YAMC_SQLLogin_1', 'z6ugdren8j', 'DBAPIFusion')
         cursor = conn.cursor()
         cursor.execute("DELETE FROM Detalle WHERE idProducto = '"+str(idProducto)+"'")
         conn.commit()
@@ -729,7 +729,7 @@ def Eliminar_producto_carrito(idProducto:str):
 def Seleccionar_Pedidos():
     try:
         Lista = []
-        conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
+        conn = pymssql.connect('DBAPIFusion.mssql.somee.com', 'ADM-YAMC_SQLLogin_1', 'z6ugdren8j', 'DBAPIFusion')
         cursor = conn.cursor(as_dict=True)
         cursor.execute("select p.*, u.Nombre, u.Apellido, u.Correo from Pedidos as p inner join Cliente_Usuario as u on p.IdUsuarios = u.IdUsuarios")
         contenido = cursor.fetchall()
@@ -747,7 +747,7 @@ def Seleccionar_Pedidos():
 def Seleccionar_Pedidos_Usuario(IdUsuario:str):
     try:
         Lista = []
-        conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
+        conn = pymssql.connect('DBAPIFusion.mssql.somee.com', 'ADM-YAMC_SQLLogin_1', 'z6ugdren8j', 'DBAPIFusion')
         cursor = conn.cursor(as_dict=True)
         cursor.execute("select p.*, u.Nombre, u.Apellido, u.Correo from Pedidos as p inner join Cliente_Usuario as u on p.IdUsuarios = u.IdUsuarios where u.IdUsuarios = '"+str(IdUsuario)+"'")
         contenido = cursor.fetchall()
@@ -764,7 +764,7 @@ def Seleccionar_Pedidos_Usuario(IdUsuario:str):
 @app.get("/api/CantidadProductos/{IdUsuario}")
 def Cantidad_Productos(IdUsuario:str):
     try:
-        conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI')
+        conn = pymssql.connect('DBAPIFusion.mssql.somee.com', 'ADM-YAMC_SQLLogin_1', 'z6ugdren8j', 'DBAPIFusion')
         query = "select Cantidad as Cantidad from Detalle where IdUsuarios = '"+str(IdUsuario)+"'"
         cursor = conn.cursor(as_dict=True)
         cursor.execute(query)
@@ -782,7 +782,7 @@ def Cantidad_Productos(IdUsuario:str):
 @app.post("/api/Actualizar_Pedidos")
 def Filtro_Por_Usuario(x:Actualizar_Pedidos):
     try:
-        conn = pymssql.connect('proyecto-final.database.windows.net', 'ADM-YAMC', 'Ya95509550', 'DBAPI') 
+        conn = pymssql.connect('DBAPIFusion.mssql.somee.com', 'ADM-YAMC_SQLLogin_1', 'z6ugdren8j', 'DBAPIFusion') 
         cursor = conn.cursor()
         cursor.execute("UPDATE [dbo].[Pedidos] SET Estado = '"+x.Estado+"' WHERE IdOrden = "+str(x.IdOrden)+"")
         conn.commit()
